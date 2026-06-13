@@ -2,12 +2,11 @@ import { useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
 
 export function useAuth() {
-  const store = useAuthStore();
+  const initialize = useAuthStore((s) => s.initialize);
 
   useEffect(() => {
-    const unsubscribe = store.initialize();
-    return unsubscribe;
-  }, []);
+    initialize();
+  }, [initialize]);
 
-  return store;
+  return useAuthStore();
 }

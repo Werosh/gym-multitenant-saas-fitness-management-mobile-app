@@ -13,14 +13,15 @@ import { RootStackParamList } from './types';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
-  const { user, profile, isInitialized } = useAuthStore();
+  const profile = useAuthStore((s) => s.profile);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const needsGymSetup = useNeedsGymSetup();
 
   if (!isInitialized) {
     return <LoadingScreen message="Initializing GymHub..." />;
   }
 
-  if (!user || !profile) {
+  if (!profile) {
     return (
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Auth" component={AuthNavigator} />

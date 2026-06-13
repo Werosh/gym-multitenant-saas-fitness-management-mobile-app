@@ -9,6 +9,7 @@ import { AppText } from '../../components/ui/AppText';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
 import { AuthStackParamList } from '../../navigation/types';
+import { MOCK_PASSWORD } from '../../data/mockData';
 import { isValidEmail, isValidPassword } from '../../utils/validators';
 import { spacing } from '../../config/theme';
 
@@ -74,6 +75,10 @@ export function LoginScreen() {
 
         <Button title="Sign In" onPress={handleLogin} loading={isLoading} />
 
+        <AppText variant="caption" secondary style={styles.demoHint}>
+          Demo: owner@gymhub.com / {MOCK_PASSWORD}
+        </AppText>
+
         <TouchableOpacity onPress={() => navigation.navigate('Register')} style={styles.link}>
           <AppText secondary>
             Don't have an account?{' '}
@@ -101,6 +106,10 @@ const styles = StyleSheet.create({
   },
   formTitle: {
     marginBottom: spacing.lg,
+  },
+  demoHint: {
+    marginTop: spacing.md,
+    textAlign: 'center',
   },
   link: {
     marginTop: spacing.lg,
