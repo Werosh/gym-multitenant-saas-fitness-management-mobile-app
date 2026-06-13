@@ -17,6 +17,7 @@ import { useResponsive } from '../../hooks/useResponsive';
 import { AuthStackParamList } from '../../navigation/types';
 import { brand, spacing, borderRadius } from '../../config/theme';
 import { DemoLoginFab } from '../../components/ui/DemoLoginFab';
+import { GoogleSignInButton } from '../../components/ui/GoogleSignInButton';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Welcome'>;
 
@@ -62,6 +63,10 @@ export function WelcomeScreen() {
             >
               <Text style={styles.ctaText}>Get Started</Text>
             </TouchableOpacity>
+
+            <View style={styles.googleWrap}>
+              <GoogleSignInButton label="Continue with Google" />
+            </View>
 
             <View style={styles.authRow}>
               <TouchableOpacity
@@ -137,6 +142,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
     letterSpacing: 0.4,
+  },
+  googleWrap: {
+    marginTop: spacing.md,
   },
   authRow: {
     flexDirection: 'row',

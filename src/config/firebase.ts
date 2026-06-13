@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Auth, getAuth, initializeAuth, Persistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
@@ -14,7 +15,23 @@ const firebaseConfig = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-export const auth = getAuth(app);
+function createAuth(firebaseApp: FirebaseApp): Auth {
+  try {
+    const authModule = require('@firebase/auth') as {
+      getReactNativePersistence?: (storage: typeof AsyncStorage) => Persistence;
+    };
+    if (authModule.getReactNativePersistence) {
+      return initializeAuth(firebaseApp, {
+        persistence: authModule.getReactNativePersistence(AsyncStorage),
+      });
+    }
+  } catch {
+    // Fall back to default auth instance below.
+  }
+  return getAuth(firebaseApp);
+}
+
+export const auth = createAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
@@ -26,7 +43,7 @@ export function getSecondaryAuth(): Auth {
   if (!secondaryAuth) {
     const existing = getApps().find((a) => a.name === 'Secondary');
     secondaryApp = existing ?? initializeApp(firebaseConfig, 'Secondary');
-    secondaryAuth = getAuth(secondaryApp);
+    secondaryAuth = createAuth(secondaryApp);
   }
   return secondaryAuth;
 }

@@ -15,6 +15,7 @@ import { UserRole } from '../../types';
 import { isValidEmail, isValidPassword, isValidGymCode } from '../../utils/validators';
 import { spacing, borderRadius } from '../../config/theme';
 import { DemoLoginFab } from '../../components/ui/DemoLoginFab';
+import { GoogleSignInButton } from '../../components/ui/GoogleSignInButton';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
 
@@ -109,6 +110,14 @@ export function RegisterScreen() {
 
       <Button title="Create account" onPress={handleRegister} loading={isLoading} style={styles.submit} />
 
+      <View style={styles.dividerRow}>
+        <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+        <AppText variant="small" muted style={styles.dividerText}>or</AppText>
+        <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+      </View>
+
+      <GoogleSignInButton label="Sign up with Google" />
+
       <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.link}>
         <AppText secondary>
           Have an account? <AppText style={{ color: colors.primary, fontWeight: '600' }}>Sign in</AppText>
@@ -141,5 +150,18 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   submit: { marginTop: spacing.sm },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.md,
+    gap: spacing.sm,
+  },
+  dividerLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+  },
+  dividerText: {
+    paddingHorizontal: spacing.xs,
+  },
   link: { marginTop: spacing.lg, alignItems: 'center', paddingBottom: spacing.lg },
 });

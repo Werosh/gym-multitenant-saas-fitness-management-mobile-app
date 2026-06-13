@@ -112,6 +112,13 @@ export interface RegisterPayload {
   goal?: string;
 }
 
+export interface GoogleProfileSetupPayload {
+  name: string;
+  role: UserRole;
+  gymCode?: string;
+  goal?: string;
+}
+
 export interface CreateGymPayload {
   gymName: string;
   location: string;

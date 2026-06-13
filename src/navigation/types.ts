@@ -60,6 +60,7 @@ export type RootStackParamList = {
   MemberStack: NavigatorScreenParams<MemberStackParamList>;
   AdminStack: NavigatorScreenParams<AdminStackParamList>;
   GymSetup: undefined;
+  GoogleRoleSetup: undefined;
 };
 
 declare global {

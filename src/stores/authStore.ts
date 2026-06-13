@@ -1,23 +1,42 @@
 import { create } from 'zustand';
 import {
-  mockLogin,
-  mockLogout,
-  mockRegister,
-  mockRestoreSession,
-  mockFetchProfile,
-  mockCreateGym,
-} from '../data/mockApi';
-import { RegisterPayload, UserProfile, CreateGymPayload, Gym } from '../types';
+  loginUser,
+  logoutUser,
+  registerUser,
+  fetchUserProfile,
+  subscribeAuthState,
+  loginWithGoogleIdToken,
+  completeGoogleProfileSetup,
+  cancelIncompleteGoogleSignIn,
+} from '../services/authService';
+import { createGym } from '../services/gymService';
+import {
+  RegisterPayload,
+  UserProfile,
+  CreateGymPayload,
+  Gym,
+  GoogleProfileSetupPayload,
+} from '../types';
 import { roleRequiresGymId } from '../utils/roleUtils';
+
+export interface PendingGoogleUser {
+  uid: string;
+  email: string;
+  name: string;
+}
 
 interface AuthState {
   profile: UserProfile | null;
   gym: Gym | null;
+  pendingGoogleUser: PendingGoogleUser | null;
   isLoading: boolean;
   isInitialized: boolean;
   error: string | null;
   initialize: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
+  completeGoogleSetup: (payload: GoogleProfileSetupPayload) => Promise<void>;
+  cancelGoogleSetup: () => Promise<void>;
   demoLogin: (userId: string) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
   logout: () => Promise<void>;
@@ -29,24 +48,123 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set, get) => ({
   profile: null,
   gym: null,
+  pendingGoogleUser: null,
   isLoading: false,
   isInitialized: false,
   error: null,
 
   initialize: async () => {
-    const profile = await mockRestoreSession();
-    set({ profile, isInitialized: true });
+    await new Promise<void>((resolve) => {
+      let settled = false;
+      subscribeAuthState(async (firebaseUser) => {
+        if (!firebaseUser) {
+          set({
+            profile: null,
+            pendingGoogleUser: null,
+            isInitialized: true,
+            isLoading: false,
+          });
+        } else {
+          try {
+            const profile = await fetchUserProfile(firebaseUser.uid);
+            if (profile) {
+              set({
+                profile,
+                pendingGoogleUser: null,
+                isInitialized: true,
+                isLoading: false,
+                error: null,
+              });
+            } else {
+              set({
+                profile: null,
+                pendingGoogleUser: {
+                  uid: firebaseUser.uid,
+                  email: firebaseUser.email ?? '',
+                  name: firebaseUser.displayName ?? 'User',
+                },
+                isInitialized: true,
+                isLoading: false,
+                error: null,
+              });
+            }
+          } catch (err) {
+            const message = err instanceof Error ? err.message : 'Failed to load profile';
+            set({ error: message, isInitialized: true, isLoading: false });
+          }
+        }
+
+        if (!settled) {
+          settled = true;
+          resolve();
+        }
+      });
+    });
   },
 
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const profile = await mockLogin(email, password);
-      set({ profile, isLoading: false });
+      const profile = await loginUser(email, password);
+      set({ profile, pendingGoogleUser: null, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Login failed';
       set({ error: message, isLoading: false });
       throw err;
+    }
+  },
+
+  loginWithGoogle: async (idToken) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { profile, firebaseUser } = await loginWithGoogleIdToken(idToken);
+      if (profile) {
+        set({ profile, pendingGoogleUser: null, isLoading: false });
+      } else {
+        set({
+          profile: null,
+          pendingGoogleUser: {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email ?? '',
+            name: firebaseUser.displayName ?? 'User',
+          },
+          isLoading: false,
+        });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Google sign in failed';
+      set({ error: message, isLoading: false });
+      throw err;
+    }
+  },
+
+  completeGoogleSetup: async (payload) => {
+    const { pendingGoogleUser } = get();
+    if (!pendingGoogleUser) throw new Error('No pending Google sign in');
+
+    set({ isLoading: true, error: null });
+    try {
+      const profile = await completeGoogleProfileSetup(
+        pendingGoogleUser.uid,
+        pendingGoogleUser.email,
+        payload,
+      );
+      set({ profile, pendingGoogleUser: null, isLoading: false });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to complete setup';
+      set({ error: message, isLoading: false });
+      throw err;
+    }
+  },
+
+  cancelGoogleSetup: async () => {
+    set({ isLoading: true });
+    try {
+      await cancelIncompleteGoogleSignIn();
+      set({ pendingGoogleUser: null, isLoading: false, error: null });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to cancel';
+      set({ error: message, isLoading: false });
     }
   },
 
@@ -55,7 +173,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const { mockLoginAsUser } = await import('../data/mockApi');
       const profile = await mockLoginAsUser(userId);
-      set({ profile, isLoading: false });
+      set({ profile, pendingGoogleUser: null, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Demo login failed';
       set({ error: message, isLoading: false });
@@ -65,8 +183,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (payload) => {
     set({ isLoading: true, error: null });
     try {
-      const profile = await mockRegister(payload);
-      set({ profile, isLoading: false });
+      const profile = await registerUser(payload);
+      set({ profile, pendingGoogleUser: null, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Registration failed';
       set({ error: message, isLoading: false });
@@ -77,8 +195,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     set({ isLoading: true });
     try {
-      await mockLogout();
-      set({ profile: null, gym: null, isLoading: false, error: null });
+      await logoutUser();
+      set({ profile: null, gym: null, pendingGoogleUser: null, isLoading: false, error: null });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Logout failed';
       set({ error: message, isLoading: false });
@@ -88,7 +206,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   refreshProfile: async () => {
     const { profile } = get();
     if (!profile) return;
-    const updated = await mockFetchProfile(profile.userId);
+    const updated = await fetchUserProfile(profile.userId);
     set({ profile: updated });
   },
 
@@ -97,8 +215,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!profile) throw new Error('Not authenticated');
     set({ isLoading: true, error: null });
     try {
-      const gym = await mockCreateGym(profile.userId, payload);
-      const updated = await mockFetchProfile(profile.userId);
+      const gym = await createGym(profile.userId, payload);
+      const updated = await fetchUserProfile(profile.userId);
       set({ gym, profile: updated, isLoading: false });
       return gym;
     } catch (err) {
@@ -123,4 +241,10 @@ export function useHasGymAccess(): boolean {
   if (!profile) return false;
   if (profile.role === 'super_admin') return true;
   return !!profile.gymId;
+}
+
+export function useNeedsGoogleRoleSetup(): boolean {
+  const profile = useAuthStore((s) => s.profile);
+  const pendingGoogleUser = useAuthStore((s) => s.pendingGoogleUser);
+  return !profile && !!pendingGoogleUser;
 }

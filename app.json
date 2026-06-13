@@ -2,6 +2,7 @@
   "expo": {
     "name": "MyGymHere",
     "slug": "MyGymHere",
+    "scheme": "mygymhere",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,6 +14,7 @@
     },
     "plugins": [
       "expo-barcode-scanner",
+      "expo-web-browser",
       [
         "expo-notifications",
         {

@@ -12,6 +12,7 @@ import { AuthStackParamList } from '../../navigation/types';
 import { isValidEmail, isValidPassword } from '../../utils/validators';
 import { spacing } from '../../config/theme';
 import { DemoLoginFab } from '../../components/ui/DemoLoginFab';
+import { GoogleSignInButton } from '../../components/ui/GoogleSignInButton';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
 
@@ -73,9 +74,14 @@ export function LoginScreen() {
       )}
 
       <Button title="Sign in" onPress={handleLogin} loading={isLoading} />
-      <AppText variant="small" muted style={styles.hint}>
-        Demo: owner@mygymhere.com · password123
-      </AppText>
+
+      <View style={styles.dividerRow}>
+        <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+        <AppText variant="small" muted style={styles.dividerText}>or</AppText>
+        <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+      </View>
+
+      <GoogleSignInButton />
     </AuthLayout>
       <DemoLoginFab />
     </View>
@@ -88,8 +94,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: spacing.sm,
   },
-  hint: {
-    marginTop: spacing.md,
-    textAlign: 'center',
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: spacing.md,
+    gap: spacing.sm,
+  },
+  dividerLine: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+  },
+  dividerText: {
+    paddingHorizontal: spacing.xs,
   },
 });
