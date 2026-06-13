@@ -5,7 +5,8 @@ import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { AppText } from '../../components/ui/AppText';
-import { Card } from '../../components/ui/Card';
+import { SectionLabel } from '../../components/ui/SectionLabel';
+import { ResponsiveRow } from '../../components/ui/ResponsiveRow';
 import { useAuthStore } from '../../stores/authStore';
 import { TrainerStackParamList } from '../../navigation/types';
 import { updateMember } from '../../services/memberService';
@@ -29,7 +30,7 @@ export function MemberProgressScreen() {
         weight: weight ? parseFloat(weight) : undefined,
         goal: goal.trim() || undefined,
       });
-      Alert.alert('Success', 'Member progress updated');
+      Alert.alert('Saved', 'Member progress updated.');
     } catch (err) {
       Alert.alert('Error', err instanceof Error ? err.message : 'Update failed');
     } finally {
@@ -38,20 +39,18 @@ export function MemberProgressScreen() {
   };
 
   return (
-    <ScreenContainer>
-      <AppText variant="h3" style={{ marginBottom: spacing.md }}>
-        Progress: {memberName}
+    <ScreenContainer keyboardAvoid>
+      <AppText variant="h3" style={{ marginBottom: spacing.md }} numberOfLines={2}>
+        {memberName}
       </AppText>
 
-      <Card>
-        <AppText secondary>
-          Update basic numeric progress for this member. Detailed analytics coming soon.
-        </AppText>
-      </Card>
+      <SectionLabel title="Progress" />
+      <ResponsiveRow>
+        <Input label="Weight kg" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
+        <Input label="Goal" value={goal} onChangeText={setGoal} />
+      </ResponsiveRow>
 
-      <Input label="Current Weight (kg)" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
-      <Input label="Goal" value={goal} onChangeText={setGoal} />
-      <Button title="Save Progress" onPress={handleUpdate} loading={loading} />
+      <Button title="Save" onPress={handleUpdate} loading={loading} />
     </ScreenContainer>
   );
 }

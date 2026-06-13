@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Header } from '../../components/ui/Header';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { SectionLabel } from '../../components/ui/SectionLabel';
 import { Card } from '../../components/ui/Card';
 import { AppText } from '../../components/ui/AppText';
@@ -27,26 +28,18 @@ export function MemberDashboardScreen() {
   );
 
   const membershipTone =
-    stats?.membershipStatus === 'active'
-      ? 'success'
-      : stats?.membershipStatus === 'expired'
-        ? 'warning'
-        : 'default';
+    stats?.membershipStatus === 'active' ? 'success' : stats?.membershipStatus === 'expired' ? 'warning' : 'default';
 
   return (
     <RoleGuard allowedRoles={['member']}>
       <ScreenContainer>
-        <Header
-          title="Home"
-          subtitle={profile?.name ?? 'Member'}
-          rightAction={{ label: 'Sign out', onPress: logout }}
-        />
+        <Header title="Home" subtitle={profile?.name ?? 'Member'} rightAction={{ label: 'Sign out', onPress: logout }} />
 
         <SectionLabel title="This week" />
-        <View style={styles.statsGrid}>
+        <StatGrid>
           <StatCard label="Workouts" value={stats?.assignedWorkouts ?? '—'} />
           <StatCard label="Check-ins" value={stats?.totalCheckIns ?? '—'} />
-        </View>
+        </StatGrid>
 
         <SectionLabel title="Membership" />
         <Card>
@@ -64,10 +57,10 @@ export function MemberDashboardScreen() {
             {profile?.goal && (
               <Card>
                 <AppText variant="caption" secondary>Goal</AppText>
-                <AppText variant="h3" style={{ marginTop: 4 }}>{profile.goal}</AppText>
+                <AppText variant="h3" style={{ marginTop: 4 }} numberOfLines={3}>{profile.goal}</AppText>
               </Card>
             )}
-            {profile?.weight && (
+            {profile?.weight != null && (
               <Card>
                 <AppText variant="caption" secondary>Weight</AppText>
                 <AppText variant="stat" style={{ marginTop: 4 }}>{profile.weight} kg</AppText>
@@ -79,11 +72,3 @@ export function MemberDashboardScreen() {
     </RoleGuard>
   );
 }
-
-const styles = StyleSheet.create({
-  statsGrid: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-});

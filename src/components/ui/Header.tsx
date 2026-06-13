@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useThemeStore } from '../../stores/themeStore';
 import { AppText } from './AppText';
 import { spacing } from '../../config/theme';
@@ -16,15 +16,17 @@ export function Header({ title, subtitle, rightAction }: HeaderProps) {
   return (
     <View style={[styles.container, { borderBottomColor: colors.borderSubtle }]}>
       <View style={styles.left}>
-        <AppText variant="h2">{title}</AppText>
+        <AppText variant="h2" numberOfLines={2} style={styles.title}>
+          {title}
+        </AppText>
         {subtitle && (
-          <AppText variant="caption" secondary style={styles.subtitle}>
+          <AppText variant="caption" secondary numberOfLines={2} style={styles.subtitle}>
             {subtitle}
           </AppText>
         )}
       </View>
       {rightAction && (
-        <TouchableOpacity onPress={rightAction.onPress} hitSlop={8}>
+        <TouchableOpacity onPress={rightAction.onPress} hitSlop={8} style={styles.action}>
           <AppText variant="caption" style={{ color: colors.primary, fontWeight: '600' }}>
             {rightAction.label}
           </AppText>
@@ -37,17 +39,26 @@ export function Header({ title, subtitle, rightAction }: HeaderProps) {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
     marginBottom: spacing.lg,
     paddingBottom: spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: spacing.sm,
   },
   left: {
     flex: 1,
-    paddingRight: spacing.md,
+    minWidth: 0,
+  },
+  title: {
+    flexShrink: 1,
   },
   subtitle: {
     marginTop: 4,
+  },
+  action: {
+    flexShrink: 0,
+    paddingVertical: 4,
   },
 });

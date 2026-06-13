@@ -6,6 +6,8 @@ import { Card } from '../../components/ui/Card';
 import { AppText } from '../../components/ui/AppText';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { SectionLabel } from '../../components/ui/SectionLabel';
+import { ResponsiveRow } from '../../components/ui/ResponsiveRow';
 import { RoleGuard } from '../../components/guards/RoleGuard';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
@@ -34,7 +36,7 @@ export function ProfileScreen() {
         goal: goal.trim() || undefined,
       });
       await refreshProfile();
-      Alert.alert('Success', 'Profile updated');
+      Alert.alert('Saved', 'Profile updated.');
     } catch (err) {
       Alert.alert('Error', err instanceof Error ? err.message : 'Update failed');
     } finally {
@@ -44,34 +46,27 @@ export function ProfileScreen() {
 
   return (
     <RoleGuard allowedRoles={['member']}>
-      <ScreenContainer>
+      <ScreenContainer keyboardAvoid>
         <Header title="Profile" subtitle={profile?.email} />
 
         <Card>
-          <AppText variant="caption" secondary>
-            Role
+          <AppText variant="caption" secondary>Role</AppText>
+          <AppText variant="h3" style={{ marginTop: 4 }}>
+            {profile ? getRoleLabel(profile.role) : '—'}
           </AppText>
-          <AppText variant="h3">{profile ? getRoleLabel(profile.role) : '—'}</AppText>
-          {profile?.gymId && (
-            <AppText variant="caption" secondary style={{ marginTop: spacing.xs }}>
-              Gym ID: {profile.gymId}
-            </AppText>
-          )}
         </Card>
 
+        <SectionLabel title="Details" />
         <Input label="Name" value={name} onChangeText={setName} />
-        <Input label="Weight (kg)" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
-        <Input label="Height (cm)" value={height} onChangeText={setHeight} keyboardType="decimal-pad" />
+        <ResponsiveRow>
+          <Input label="Weight kg" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
+          <Input label="Height cm" value={height} onChangeText={setHeight} keyboardType="decimal-pad" />
+        </ResponsiveRow>
         <Input label="Goal" value={goal} onChangeText={setGoal} />
 
-        <Button title="Save Profile" onPress={handleSave} loading={loading} />
-        <Button
-          title={`Switch to ${mode === 'dark' ? 'Light' : 'Dark'} Mode`}
-          variant="outline"
-          onPress={toggleTheme}
-          style={{ marginTop: spacing.sm }}
-        />
-        <Button title="Sign Out" variant="danger" onPress={logout} style={{ marginTop: spacing.sm }} />
+        <Button title="Save profile" onPress={handleSave} loading={loading} />
+        <Button title={`${mode === 'dark' ? 'Light' : 'Dark'} mode`} variant="outline" onPress={toggleTheme} style={{ marginTop: spacing.sm }} />
+        <Button title="Sign out" variant="danger" onPress={logout} style={{ marginTop: spacing.sm }} />
       </ScreenContainer>
     </RoleGuard>
   );

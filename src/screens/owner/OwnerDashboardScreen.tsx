@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Header } from '../../components/ui/Header';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { SectionLabel } from '../../components/ui/SectionLabel';
 import { AppText } from '../../components/ui/AppText';
 import { Card } from '../../components/ui/Card';
@@ -38,19 +38,15 @@ export function OwnerDashboardScreen() {
   return (
     <RoleGuard allowedRoles={['owner']}>
       <ScreenContainer onRefresh={onRefresh} refreshing={refreshing}>
-        <Header
-          title="Dashboard"
-          subtitle={profile?.name ?? 'Owner'}
-          rightAction={{ label: 'Sign out', onPress: logout }}
-        />
+        <Header title="Dashboard" subtitle={profile?.name ?? 'Owner'} rightAction={{ label: 'Sign out', onPress: logout }} />
 
         <SectionLabel title="Overview" />
-        <View style={styles.statsGrid}>
+        <StatGrid>
           <StatCard label="Members" value={stats?.totalMembers ?? '—'} />
           <StatCard label="Active" value={stats?.activeMembers ?? '—'} accent={colors.success} />
           <StatCard label="Expired" value={stats?.expiredMemberships ?? '—'} accent={colors.warning} />
           <StatCard label="Check-ins today" value={stats?.todayAttendance ?? '—'} />
-        </View>
+        </StatGrid>
 
         <SectionLabel title="Revenue" />
         <Card>
@@ -74,12 +70,3 @@ export function OwnerDashboardScreen() {
     </RoleGuard>
   );
 }
-
-const styles = StyleSheet.create({
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: spacing.sm,
-  },
-});

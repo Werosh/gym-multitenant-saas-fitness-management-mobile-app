@@ -48,15 +48,17 @@ export function WelcomeScreen() {
               onPress={() => demoLogin(account.userId)}
               activeOpacity={0.7}
             >
-              <View>
-                <AppText variant="h3" style={styles.demoLabel}>
+              <View style={styles.demoText}>
+                <AppText variant="h3" style={styles.demoLabel} numberOfLines={1}>
                   {account.label}
                 </AppText>
-                <AppText variant="caption" secondary>
+                <AppText variant="caption" secondary numberOfLines={2}>
                   {account.desc}
                 </AppText>
               </View>
-              <AppText style={{ color: colors.primary, fontWeight: '600', fontSize: 13 }}>Open</AppText>
+              <AppText style={{ color: colors.primary, fontWeight: '600', fontSize: 13, flexShrink: 0 }}>
+                Open
+              </AppText>
             </TouchableOpacity>
           ))}
         </View>
@@ -67,21 +69,18 @@ export function WelcomeScreen() {
 
 const styles = StyleSheet.create({
   main: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'flex-end',
     paddingBottom: spacing.md,
+    width: '100%',
   },
-  gap: {
-    marginTop: spacing.sm,
-  },
-  section: {
-    marginTop: spacing.xl,
-    marginBottom: spacing.sm,
-  },
+  gap: { marginTop: spacing.sm },
+  section: { marginTop: spacing.xl, marginBottom: spacing.sm },
   demoPanel: {
     borderRadius: 6,
     borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
+    width: '100%',
   },
   demoRow: {
     flexDirection: 'row',
@@ -89,9 +88,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: spacing.md,
     paddingVertical: 14,
+    gap: spacing.sm,
   },
-  demoLabel: {
-    fontSize: 15,
-    marginBottom: 2,
-  },
+  demoText: { flex: 1, minWidth: 0 },
+  demoLabel: { fontSize: 15, marginBottom: 2 },
 });

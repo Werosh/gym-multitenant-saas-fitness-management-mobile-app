@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { Alert } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
-import { AppText } from '../../components/ui/AppText';
+import { SectionLabel } from '../../components/ui/SectionLabel';
+import { ChipSelect } from '../../components/ui/ChipSelect';
+import { ResponsiveRow } from '../../components/ui/ResponsiveRow';
 import { useAuthStore } from '../../stores/authStore';
 import { useGymStore } from '../../stores/gymStore';
-import { useThemeStore } from '../../stores/themeStore';
 import { OwnerStackParamList } from '../../navigation/types';
 import { createMember, updateMember } from '../../services/memberService';
 import { MembershipPlan } from '../../types';
@@ -21,7 +22,6 @@ export function MemberFormScreen() {
   const existing = route.params?.member;
   const profile = useAuthStore((s) => s.profile);
   const { trainers, loadMembers } = useGymStore();
-  const colors = useThemeStore((s) => s.colors);
 
   const [name, setName] = useState(existing?.name ?? '');
   const [email, setEmail] = useState(existing?.email ?? '');
@@ -34,12 +34,16 @@ export function MemberFormScreen() {
   const [plan, setPlan] = useState<MembershipPlan>('monthly');
   const [loading, setLoading] = useState(false);
 
+  const trainerOptions = [
+    { value: '', label: 'None' },
+    ...trainers.map((t) => ({ value: t.userId, label: t.name.split(' ')[0] })),
+  ];
+
   const handleSave = async () => {
     if (!profile?.gymId || !name.trim()) {
-      Alert.alert('Validation', 'Name is required');
+      Alert.alert('Required', 'Name is required');
       return;
     }
-
     setLoading(true);
     try {
       if (existing) {
@@ -53,7 +57,7 @@ export function MemberFormScreen() {
         });
       } else {
         if (!email.trim() || !password) {
-          Alert.alert('Validation', 'Email and password required for new members');
+          Alert.alert('Required', 'Email and password required');
           setLoading(false);
           return;
         }
@@ -79,86 +83,44 @@ export function MemberFormScreen() {
   };
 
   return (
-    <ScreenContainer>
-      <Input label="Full Name" value={name} onChangeText={setName} />
+    <ScreenContainer keyboardAvoid>
+      <SectionLabel title="Account" />
+      <Input label="Full name" value={name} onChangeText={setName} />
       {!existing && (
         <>
           <Input label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
           <Input label="Password" value={password} onChangeText={setPassword} secureTextEntry />
         </>
       )}
-      <Input label="Age" value={age} onChangeText={setAge} keyboardType="numeric" />
-      <Input label="Weight (kg)" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
-      <Input label="Height (cm)" value={height} onChangeText={setHeight} keyboardType="decimal-pad" />
-      <Input label="Goal" value={goal} onChangeText={setGoal} />
 
-      <AppText variant="caption" secondary>
-        Assign Trainer
-      </AppText>
-      <View style={styles.trainerRow}>
-        <TouchableOpacity
-          style={[styles.chip, { borderColor: colors.border, backgroundColor: !trainerId ? colors.primary : colors.surface }]}
-          onPress={() => setTrainerId('')}
-        >
-          <AppText style={{ color: !trainerId ? '#FFF' : colors.text, fontSize: 13 }}>None</AppText>
-        </TouchableOpacity>
-        {trainers.map((t) => (
-          <TouchableOpacity
-            key={t.userId}
-            style={[styles.chip, { borderColor: colors.border, backgroundColor: trainerId === t.userId ? colors.primary : colors.surface }]}
-            onPress={() => setTrainerId(t.userId)}
-          >
-            <AppText style={{ color: trainerId === t.userId ? '#FFF' : colors.text, fontSize: 13 }}>
-              {t.name}
-            </AppText>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <SectionLabel title="Body metrics" />
+      <ResponsiveRow>
+        <Input label="Age" value={age} onChangeText={setAge} keyboardType="numeric" />
+        <Input label="Weight kg" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
+      </ResponsiveRow>
+      <ResponsiveRow>
+        <Input label="Height cm" value={height} onChangeText={setHeight} keyboardType="decimal-pad" />
+        <Input label="Goal" value={goal} onChangeText={setGoal} />
+      </ResponsiveRow>
+
+      <SectionLabel title="Trainer" />
+      <ChipSelect options={trainerOptions} value={trainerId} onChange={setTrainerId} />
 
       {!existing && (
         <>
-          <AppText variant="caption" secondary>
-            Membership Plan
-          </AppText>
-          <View style={styles.planRow}>
-            {(['monthly', 'yearly'] as MembershipPlan[]).map((p) => (
-              <Button
-                key={p}
-                title={p.charAt(0).toUpperCase() + p.slice(1)}
-                variant={plan === p ? 'primary' : 'outline'}
-                onPress={() => setPlan(p)}
-                style={styles.planBtn}
-              />
-            ))}
-          </View>
+          <SectionLabel title="Membership" />
+          <ChipSelect
+            options={[
+              { value: 'monthly', label: 'Monthly' },
+              { value: 'yearly', label: 'Yearly' },
+            ]}
+            value={plan}
+            onChange={setPlan}
+          />
         </>
       )}
 
-      <Button title={existing ? 'Update Member' : 'Add Member'} onPress={handleSave} loading={loading} />
+      <Button title={existing ? 'Save changes' : 'Add member'} onPress={handleSave} loading={loading} style={{ marginTop: spacing.sm }} />
     </ScreenContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  trainerRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  chip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  planRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginVertical: spacing.md,
-  },
-  planBtn: {
-    flex: 1,
-    minHeight: 40,
-  },
-});

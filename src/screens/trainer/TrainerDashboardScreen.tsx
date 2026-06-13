@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Header } from '../../components/ui/Header';
 import { StatCard } from '../../components/ui/StatCard';
+import { StatGrid } from '../../components/ui/StatGrid';
 import { SectionLabel } from '../../components/ui/SectionLabel';
 import { Card } from '../../components/ui/Card';
 import { AppText } from '../../components/ui/AppText';
@@ -42,17 +43,13 @@ export function TrainerDashboardScreen() {
   return (
     <RoleGuard allowedRoles={['trainer']}>
       <ScreenContainer>
-        <Header
-          title="Dashboard"
-          subtitle={profile?.name ?? 'Trainer'}
-          rightAction={{ label: 'Sign out', onPress: logout }}
-        />
+        <Header title="Dashboard" subtitle={profile?.name ?? 'Trainer'} rightAction={{ label: 'Sign out', onPress: logout }} />
 
         <SectionLabel title="Overview" />
-        <View style={styles.statsGrid}>
+        <StatGrid>
           <StatCard label="Members" value={assignedCount} />
           <StatCard label="Workout plans" value={workoutCount} />
-        </View>
+        </StatGrid>
 
         <SectionLabel title="Actions" />
         <Card padded={false}>
@@ -70,16 +67,13 @@ export function TrainerDashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  statsGrid: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
-  },
   linkRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: spacing.md,
+    flexWrap: 'wrap',
+    gap: spacing.sm,
   },
-  linkTitle: { fontSize: 15 },
+  linkTitle: { fontSize: 15, flex: 1, minWidth: 0 },
 });

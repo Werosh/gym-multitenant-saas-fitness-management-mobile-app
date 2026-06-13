@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { AppText } from '../../components/ui/AppText';
 import { Card } from '../../components/ui/Card';
+import { SectionLabel } from '../../components/ui/SectionLabel';
+import { ResponsiveRow } from '../../components/ui/ResponsiveRow';
 import { useAuthStore } from '../../stores/authStore';
 import { TrainerStackParamList } from '../../navigation/types';
 import { createWorkout, updateWorkout } from '../../services/workoutService';
@@ -50,10 +52,9 @@ export function WorkoutBuilderScreen() {
   const handleSave = async () => {
     if (!profile?.gymId || !profile.userId) return;
     if (!title.trim() || exercises.some((e) => !e.exerciseName.trim())) {
-      Alert.alert('Validation', 'Title and exercise names are required');
+      Alert.alert('Required', 'Title and exercise names are required');
       return;
     }
-
     setLoading(true);
     try {
       if (workout) {
@@ -70,81 +71,42 @@ export function WorkoutBuilderScreen() {
   };
 
   return (
-    <ScreenContainer>
-      <AppText variant="h3" style={styles.subtitle}>
-        Workout for {memberName}
+    <ScreenContainer keyboardAvoid>
+      <AppText variant="h3" style={styles.subtitle} numberOfLines={2}>
+        {memberName}
       </AppText>
 
-      <Input label="Plan Title" value={title} onChangeText={setTitle} />
+      <SectionLabel title="Plan" />
+      <Input label="Title" value={title} onChangeText={setTitle} />
 
       {exercises.map((exercise, index) => (
         <Card key={index}>
-          <AppText variant="caption" secondary>
+          <AppText variant="label" secondary style={{ marginBottom: spacing.sm }}>
             Exercise {index + 1}
           </AppText>
           <Input
-            label="Exercise Name"
+            label="Name"
             value={exercise.exerciseName}
             onChangeText={(v) => updateExercise(index, 'exerciseName', v)}
           />
-          <View style={styles.row}>
-            <Input
-              label="Sets"
-              value={String(exercise.sets)}
-              onChangeText={(v) => updateExercise(index, 'sets', v)}
-              keyboardType="numeric"
-              style={styles.half}
-            />
-            <Input
-              label="Reps"
-              value={String(exercise.reps)}
-              onChangeText={(v) => updateExercise(index, 'reps', v)}
-              keyboardType="numeric"
-              style={styles.half}
-            />
-          </View>
-          <View style={styles.row}>
-            <Input
-              label="Weight (kg)"
-              value={String(exercise.weight)}
-              onChangeText={(v) => updateExercise(index, 'weight', v)}
-              keyboardType="decimal-pad"
-              style={styles.half}
-            />
-            <Input
-              label="Rest (sec)"
-              value={String(exercise.restTime)}
-              onChangeText={(v) => updateExercise(index, 'restTime', v)}
-              keyboardType="numeric"
-              style={styles.half}
-            />
-          </View>
+          <ResponsiveRow>
+            <Input label="Sets" value={String(exercise.sets)} onChangeText={(v) => updateExercise(index, 'sets', v)} keyboardType="numeric" />
+            <Input label="Reps" value={String(exercise.reps)} onChangeText={(v) => updateExercise(index, 'reps', v)} keyboardType="numeric" />
+          </ResponsiveRow>
+          <ResponsiveRow>
+            <Input label="Weight kg" value={String(exercise.weight)} onChangeText={(v) => updateExercise(index, 'weight', v)} keyboardType="decimal-pad" />
+            <Input label="Rest sec" value={String(exercise.restTime)} onChangeText={(v) => updateExercise(index, 'restTime', v)} keyboardType="numeric" />
+          </ResponsiveRow>
         </Card>
       ))}
 
-      <Button
-        title="+ Add Exercise"
-        variant="outline"
-        onPress={() => setExercises((prev) => [...prev, emptyExercise()])}
-        style={styles.addBtn}
-      />
-      <Button title={workout ? 'Update Workout' : 'Save Workout'} onPress={handleSave} loading={loading} />
+      <Button title="Add exercise" variant="outline" onPress={() => setExercises((prev) => [...prev, emptyExercise()])} style={styles.addBtn} />
+      <Button title={workout ? 'Save changes' : 'Save plan'} onPress={handleSave} loading={loading} />
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  subtitle: {
-    marginBottom: spacing.md,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  half: {
-    flex: 1,
-  },
-  addBtn: {
-    marginBottom: spacing.md,
-  },
+  subtitle: { marginBottom: spacing.md },
+  addBtn: { marginBottom: spacing.md },
 });

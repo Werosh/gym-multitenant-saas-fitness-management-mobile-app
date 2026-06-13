@@ -6,10 +6,13 @@ import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Header } from '../../components/ui/Header';
 import { Card } from '../../components/ui/Card';
 import { AppText } from '../../components/ui/AppText';
+import { ActionLinks } from '../../components/ui/ActionLinks';
+import { ResponsiveRow } from '../../components/ui/ResponsiveRow';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { RoleGuard } from '../../components/guards/RoleGuard';
 import { useAuthStore } from '../../stores/authStore';
+import { useResponsive } from '../../hooks/useResponsive';
 import { getMembersByTrainer } from '../../services/memberService';
 import { UserProfile } from '../../types';
 import { TrainerStackParamList } from '../../navigation/types';
@@ -20,6 +23,7 @@ type Nav = NativeStackNavigationProp<TrainerStackParamList>;
 export function AssignedMembersScreen() {
   const navigation = useNavigation<Nav>();
   const profile = useAuthStore((s) => s.profile);
+  const { stackActions } = useResponsive();
   const [members, setMembers] = useState<UserProfile[]>([]);
 
   useFocusEffect(
@@ -32,43 +36,74 @@ export function AssignedMembersScreen() {
   return (
     <RoleGuard allowedRoles={['trainer']}>
       <ScreenContainer>
-        <Header title="Assigned Members" subtitle={`${members.length} members`} />
+        <Header title="Members" subtitle={`${members.length} assigned`} />
 
         {members.length === 0 ? (
-          <EmptyState title="No assigned members" description="Your gym owner will assign members to you." />
+          <EmptyState title="No members" description="Your gym owner will assign members to you." />
         ) : (
           members.map((member) => (
             <Card key={member.userId}>
-              <AppText variant="h3">{member.name}</AppText>
-              {member.goal && <AppText secondary>Goal: {member.goal}</AppText>}
-              {member.weight && (
-                <AppText variant="caption" secondary style={styles.meta}>
-                  Weight: {member.weight} kg
+              <AppText variant="h3" numberOfLines={1}>{member.name}</AppText>
+              {member.goal && (
+                <AppText variant="caption" secondary numberOfLines={2} style={styles.meta}>
+                  {member.goal}
                 </AppText>
               )}
-              <View style={styles.actions}>
-                <Button
-                  title="Create Workout"
-                  onPress={() =>
-                    navigation.navigate('WorkoutBuilder', {
-                      memberId: member.userId,
-                      memberName: member.name,
-                    })
-                  }
-                  style={styles.btn}
-                />
-                <Button
-                  title="Progress"
-                  variant="outline"
-                  onPress={() =>
-                    navigation.navigate('MemberProgress', {
-                      memberId: member.userId,
-                      memberName: member.name,
-                    })
-                  }
-                  style={styles.btn}
-                />
-              </View>
+              {member.weight != null && (
+                <AppText variant="small" muted style={styles.meta}>
+                  {member.weight} kg
+                </AppText>
+              )}
+
+              {stackActions ? (
+                <View style={styles.stackActions}>
+                  <Button
+                    title="Create workout"
+                    size="sm"
+                    onPress={() =>
+                      navigation.navigate('WorkoutBuilder', {
+                        memberId: member.userId,
+                        memberName: member.name,
+                      })
+                    }
+                  />
+                  <Button
+                    title="Update progress"
+                    variant="outline"
+                    size="sm"
+                    onPress={() =>
+                      navigation.navigate('MemberProgress', {
+                        memberId: member.userId,
+                        memberName: member.name,
+                      })
+                    }
+                  />
+                </View>
+              ) : (
+                <ResponsiveRow style={styles.actions}>
+                  <Button
+                    title="Workout"
+                    size="sm"
+                    onPress={() =>
+                      navigation.navigate('WorkoutBuilder', {
+                        memberId: member.userId,
+                        memberName: member.name,
+                      })
+                    }
+                  />
+                  <Button
+                    title="Progress"
+                    variant="outline"
+                    size="sm"
+                    onPress={() =>
+                      navigation.navigate('MemberProgress', {
+                        memberId: member.userId,
+                        memberName: member.name,
+                      })
+                    }
+                  />
+                </ResponsiveRow>
+              )}
             </Card>
           ))
         )}
@@ -78,17 +113,7 @@ export function AssignedMembersScreen() {
 }
 
 const styles = StyleSheet.create({
-  meta: {
-    marginTop: spacing.xs,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginTop: spacing.md,
-  },
-  btn: {
-    flex: 1,
-    minHeight: 40,
-    paddingVertical: spacing.sm,
-  },
+  meta: { marginTop: spacing.xs },
+  actions: { marginTop: spacing.md },
+  stackActions: { marginTop: spacing.md, gap: spacing.sm },
 });

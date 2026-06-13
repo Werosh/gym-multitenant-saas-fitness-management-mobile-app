@@ -6,7 +6,7 @@ import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Header } from '../../components/ui/Header';
 import { Card } from '../../components/ui/Card';
 import { AppText } from '../../components/ui/AppText';
-import { Button } from '../../components/ui/Button';
+import { ActionLinks } from '../../components/ui/ActionLinks';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { RoleGuard } from '../../components/guards/RoleGuard';
 import { useAuthStore } from '../../stores/authStore';
@@ -35,7 +35,7 @@ export function TrainersScreen() {
     members.filter((m) => m.trainerId === trainerId).length;
 
   const handleDelete = (trainerId: string, name: string) => {
-    Alert.alert('Remove Trainer', `Remove ${name}?`, [
+    Alert.alert('Remove trainer', `Remove ${name}?`, [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Remove',
@@ -54,25 +54,24 @@ export function TrainersScreen() {
       <ScreenContainer>
         <Header
           title="Trainers"
-          subtitle={`${trainers.length} total`}
-          rightAction={{ label: '+ Add', onPress: () => navigation.navigate('TrainerForm') }}
+          subtitle={`${trainers.length} on staff`}
+          rightAction={{ label: 'Add', onPress: () => navigation.navigate('TrainerForm') }}
         />
 
         {trainers.length === 0 ? (
-          <EmptyState title="No trainers yet" description="Add trainers to assign members and create workouts." />
+          <EmptyState title="No trainers" description="Add trainers to assign members and build workout plans." />
         ) : (
           trainers.map((trainer) => (
             <Card key={trainer.userId}>
-              <AppText variant="h3">{trainer.name}</AppText>
-              <AppText secondary>{trainer.email}</AppText>
-              <AppText variant="caption" secondary style={styles.meta}>
-                Assigned members: {getAssignedCount(trainer.userId)}
+              <AppText variant="h3" numberOfLines={1}>{trainer.name}</AppText>
+              <AppText variant="caption" secondary numberOfLines={1}>{trainer.email}</AppText>
+              <AppText variant="small" muted style={styles.meta}>
+                {getAssignedCount(trainer.userId)} assigned members
               </AppText>
-              <Button
-                title="Remove"
-                variant="danger"
-                onPress={() => handleDelete(trainer.userId, trainer.name)}
-                style={styles.btn}
+              <ActionLinks
+                actions={[
+                  { label: 'Remove', tone: 'danger', onPress: () => handleDelete(trainer.userId, trainer.name) },
+                ]}
               />
             </Card>
           ))
@@ -83,13 +82,5 @@ export function TrainersScreen() {
 }
 
 const styles = StyleSheet.create({
-  meta: {
-    marginTop: spacing.xs,
-    marginBottom: spacing.sm,
-  },
-  btn: {
-    alignSelf: 'flex-start',
-    paddingVertical: spacing.sm,
-    minHeight: 36,
-  },
+  meta: { marginTop: spacing.sm },
 });

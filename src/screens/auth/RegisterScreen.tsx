@@ -60,7 +60,7 @@ export function RegisterScreen() {
   };
 
   return (
-    <ScreenContainer>
+    <ScreenContainer keyboardAvoid>
       <BrandMark compact />
       <AppText variant="h2" style={styles.title}>Create account</AppText>
       <AppText secondary style={styles.sub}>Set up your profile to get started.</AppText>

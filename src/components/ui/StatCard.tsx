@@ -29,8 +29,7 @@ export function StatCard({ label, value, accent }: StatCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
-    minWidth: '46%',
+    width: '100%',
     padding: spacing.md,
     paddingLeft: spacing.md + 4,
     borderRadius: 6,

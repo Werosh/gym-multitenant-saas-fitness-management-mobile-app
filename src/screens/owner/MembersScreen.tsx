@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
@@ -7,11 +7,11 @@ import { Header } from '../../components/ui/Header';
 import { Card } from '../../components/ui/Card';
 import { AppText } from '../../components/ui/AppText';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import { ActionLinks } from '../../components/ui/ActionLinks';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { RoleGuard } from '../../components/guards/RoleGuard';
 import { useAuthStore } from '../../stores/authStore';
 import { useGymStore } from '../../stores/gymStore';
-import { useThemeStore } from '../../stores/themeStore';
 import { OwnerStackParamList } from '../../navigation/types';
 import { deleteMember } from '../../services/memberService';
 import { spacing } from '../../config/theme';
@@ -22,7 +22,6 @@ export function MembersScreen() {
   const navigation = useNavigation<Nav>();
   const profile = useAuthStore((s) => s.profile);
   const { members, trainers, loadMembers, loadTrainers } = useGymStore();
-  const colors = useThemeStore((s) => s.colors);
 
   useFocusEffect(
     useCallback(() => {
@@ -67,8 +66,8 @@ export function MembersScreen() {
             <Card key={member.userId}>
               <View style={styles.top}>
                 <View style={styles.info}>
-                  <AppText variant="h3" style={styles.name}>{member.name}</AppText>
-                  <AppText variant="caption" secondary>{member.email}</AppText>
+                  <AppText variant="h3" style={styles.name} numberOfLines={1}>{member.name}</AppText>
+                  <AppText variant="caption" secondary numberOfLines={1}>{member.email}</AppText>
                 </View>
                 <StatusBadge
                   label={member.membershipStatus ?? 'active'}
@@ -76,20 +75,17 @@ export function MembersScreen() {
                 />
               </View>
 
-              <AppText variant="small" muted style={styles.detail}>
+              <AppText variant="small" muted style={styles.detail} numberOfLines={2}>
                 Trainer · {getTrainerName(member.trainerId)}
                 {member.goal ? `  ·  ${member.goal}` : ''}
               </AppText>
 
-              <View style={styles.actions}>
-                <TouchableOpacity onPress={() => navigation.navigate('MemberForm', { member })}>
-                  <AppText style={{ color: colors.primary, fontWeight: '600', fontSize: 13 }}>Edit</AppText>
-                </TouchableOpacity>
-                <View style={[styles.actionSep, { backgroundColor: colors.border }]} />
-                <TouchableOpacity onPress={() => handleDelete(member.userId, member.name)}>
-                  <AppText style={{ color: colors.error, fontWeight: '600', fontSize: 13 }}>Remove</AppText>
-                </TouchableOpacity>
-              </View>
+              <ActionLinks
+                actions={[
+                  { label: 'Edit', onPress: () => navigation.navigate('MemberForm', { member }) },
+                  { label: 'Remove', tone: 'danger', onPress: () => handleDelete(member.userId, member.name) },
+                ]}
+              />
             </Card>
           ))
         )}
@@ -103,21 +99,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    gap: spacing.sm,
   },
-  info: { flex: 1, paddingRight: spacing.sm },
+  info: { flex: 1, minWidth: 0 },
   name: { fontSize: 16, marginBottom: 2 },
   detail: { marginTop: spacing.sm },
-  actions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(128,128,128,0.2)',
-    gap: spacing.md,
-  },
-  actionSep: {
-    width: 1,
-    height: 14,
-  },
 });

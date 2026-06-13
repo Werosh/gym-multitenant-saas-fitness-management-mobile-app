@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
+import { BrandMark } from '../../components/ui/AuthLayout';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { AppText } from '../../components/ui/AppText';
+import { SectionLabel } from '../../components/ui/SectionLabel';
+import { ChipSelect } from '../../components/ui/ChipSelect';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
 import { SubscriptionPlan } from '../../types';
 import { spacing } from '../../config/theme';
 
-const PLANS: SubscriptionPlan[] = ['basic', 'pro', 'enterprise'];
+const PLANS: { value: SubscriptionPlan; label: string }[] = [
+  { value: 'basic', label: 'Basic' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'enterprise', label: 'Enterprise' },
+];
 
 export function GymSetupScreen() {
   const { setupGym, isLoading } = useAuthStore();
@@ -21,17 +28,12 @@ export function GymSetupScreen() {
 
   const handleCreate = async () => {
     if (!gymName.trim() || !location.trim()) {
-      Alert.alert('Validation', 'Gym name and location are required');
+      Alert.alert('Required', 'Gym name and location are required.');
       return;
     }
-
     try {
       const gym = await setupGym({ gymName: gymName.trim(), location: location.trim(), subscriptionPlan });
       setCreatedCode(gym.gymCode);
-      Alert.alert(
-        'Gym Created!',
-        `Your gym code is: ${gym.gymCode}\n\nShare this code with members and trainers to join your gym.`
-      );
     } catch (err) {
       Alert.alert('Error', err instanceof Error ? err.message : 'Failed to create gym');
     }
@@ -41,12 +43,11 @@ export function GymSetupScreen() {
     return (
       <ScreenContainer scroll={false}>
         <View style={styles.center}>
-          <AppText variant="h2">Gym Ready!</AppText>
-          <AppText secondary style={styles.message}>
-            Share this code with your team:
-          </AppText>
-          <View style={[styles.codeBox, { backgroundColor: colors.primary }]}>
-            <AppText variant="h1" style={{ color: '#FFF', letterSpacing: 4 }}>
+          <BrandMark />
+          <AppText variant="h2" style={styles.readyTitle}>Gym registered</AppText>
+          <AppText secondary style={styles.message}>Share this code with your team:</AppText>
+          <View style={[styles.codeBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <AppText variant="stat" style={{ color: colors.primary, letterSpacing: 4 }}>
               {createdCode}
             </AppText>
           </View>
@@ -56,68 +57,42 @@ export function GymSetupScreen() {
   }
 
   return (
-    <ScreenContainer>
-      <AppText variant="h2" style={styles.title}>
-        Register Your Gym
-      </AppText>
+    <ScreenContainer keyboardAvoid>
+      <BrandMark />
+      <AppText variant="h2" style={styles.title}>Register your gym</AppText>
       <AppText secondary style={styles.subtitle}>
-        Set up your gym to start managing members and trainers.
+        Set up your gym to manage members and trainers.
       </AppText>
 
-      <Input label="Gym Name" value={gymName} onChangeText={setGymName} placeholder="Iron Fitness Club" />
+      <SectionLabel title="Details" />
+      <Input label="Gym name" value={gymName} onChangeText={setGymName} placeholder="Iron Fitness Club" />
       <Input label="Location" value={location} onChangeText={setLocation} placeholder="City, Country" />
 
-      <AppText variant="caption" secondary>
-        Subscription Plan
-      </AppText>
-      <View style={styles.planRow}>
-        {PLANS.map((plan) => (
-          <Button
-            key={plan}
-            title={plan.charAt(0).toUpperCase() + plan.slice(1)}
-            variant={subscriptionPlan === plan ? 'primary' : 'outline'}
-            onPress={() => setSubscriptionPlan(plan)}
-            style={styles.planButton}
-          />
-        ))}
-      </View>
+      <SectionLabel title="Plan" />
+      <ChipSelect options={PLANS} value={subscriptionPlan} onChange={setSubscriptionPlan} />
 
-      <Button title="Create Gym" onPress={handleCreate} loading={isLoading} />
+      <Button title="Create gym" onPress={handleCreate} loading={isLoading} />
     </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    marginTop: spacing.xl,
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    marginBottom: spacing.lg,
-  },
-  planRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    marginVertical: spacing.md,
-  },
-  planButton: {
-    flex: 1,
-    paddingVertical: spacing.sm,
-    minHeight: 40,
-  },
+  title: { marginTop: spacing.md, marginBottom: spacing.xs },
+  subtitle: { marginBottom: spacing.lg },
   center: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.lg,
+    alignItems: 'flex-start',
+    paddingVertical: spacing.xl,
   },
-  message: {
-    marginTop: spacing.md,
-    marginBottom: spacing.lg,
-  },
+  readyTitle: { marginTop: spacing.lg, marginBottom: spacing.sm },
+  message: { marginBottom: spacing.lg },
   codeBox: {
-    paddingHorizontal: spacing.xl,
+    alignSelf: 'stretch',
+    paddingHorizontal: spacing.lg,
     paddingVertical: spacing.lg,
-    borderRadius: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    alignItems: 'center',
   },
 });

@@ -7,6 +7,7 @@ import { Card } from '../../components/ui/Card';
 import { AppText } from '../../components/ui/AppText';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { SectionLabel } from '../../components/ui/SectionLabel';
 import { RoleGuard } from '../../components/guards/RoleGuard';
 import { useAuthStore } from '../../stores/authStore';
 import { useGymStore } from '../../stores/gymStore';
@@ -42,7 +43,7 @@ export function GymManagementScreen() {
     try {
       await updateGym(profile.gymId, { gymName: gymName.trim(), location: location.trim() });
       await loadGym(profile.gymId);
-      Alert.alert('Success', 'Gym details updated');
+      Alert.alert('Saved', 'Gym details updated.');
     } catch (err) {
       Alert.alert('Error', err instanceof Error ? err.message : 'Update failed');
     } finally {
@@ -52,26 +53,26 @@ export function GymManagementScreen() {
 
   return (
     <RoleGuard allowedRoles={['owner']}>
-      <ScreenContainer>
-        <Header title="Gym Management" subtitle="Manage your gym details" />
+      <ScreenContainer keyboardAvoid>
+        <Header title="Gym" subtitle="Settings & join code" />
 
         {gym && (
-          <Card>
-            <AppText variant="caption" secondary>
-              Gym Code (share with members & trainers)
-            </AppText>
-            <AppText variant="h1" style={{ color: colors.primary, letterSpacing: 4, marginVertical: spacing.sm }}>
-              {gym.gymCode}
-            </AppText>
-            <AppText variant="caption" secondary>
-              Plan: {gym.subscriptionPlan}
-            </AppText>
-          </Card>
+          <>
+            <SectionLabel title="Join code" />
+            <Card>
+              <AppText variant="caption" secondary>Share with members and trainers</AppText>
+              <AppText variant="stat" style={{ color: colors.primary, letterSpacing: 3, marginVertical: spacing.sm }}>
+                {gym.gymCode}
+              </AppText>
+              <AppText variant="small" muted>Plan · {gym.subscriptionPlan}</AppText>
+            </Card>
+          </>
         )}
 
-        <Input label="Gym Name" value={gymName} onChangeText={setGymName} />
+        <SectionLabel title="Details" />
+        <Input label="Gym name" value={gymName} onChangeText={setGymName} />
         <Input label="Location" value={location} onChangeText={setLocation} />
-        <Button title="Save Changes" onPress={handleUpdate} loading={loading} />
+        <Button title="Save changes" onPress={handleUpdate} loading={loading} />
       </ScreenContainer>
     </RoleGuard>
   );
