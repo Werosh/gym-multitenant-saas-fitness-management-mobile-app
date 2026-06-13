@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
-import { BrandMark } from '../../components/ui/AuthLayout';
+import { BrandMark } from '../../components/ui/BrandTitle';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { AppText } from '../../components/ui/AppText';

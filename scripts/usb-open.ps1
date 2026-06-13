@@ -1,4 +1,4 @@
-# Open GymHub in Expo Go via USB (run while npm run usb is active)
+# Open MyGymHere in Expo Go via USB (run while npm run usb is active)
 adb reverse tcp:8081 tcp:8081
 adb reverse tcp:19000 tcp:19000
 adb reverse tcp:19001 tcp:19001

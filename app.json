@@ -1,11 +1,16 @@
 {
   "expo": {
-    "name": "GymHub",
-    "slug": "GymHub",
+    "name": "MyGymHere",
+    "slug": "MyGymHere",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
+    "androidStatusBar": {
+      "translucent": true,
+      "backgroundColor": "#00000000",
+      "barStyle": "light-content"
+    },
     "plugins": [
       "expo-barcode-scanner",
       [

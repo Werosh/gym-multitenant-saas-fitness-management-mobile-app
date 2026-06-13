@@ -18,7 +18,7 @@ import {
   Gym,
 } from '../types';
 
-const SESSION_KEY = '@gymhub_mock_session';
+const SESSION_KEY = '@mygymhere_mock_session';
 
 export async function mockLogin(email: string, password: string): Promise<UserProfile> {
   await delay();

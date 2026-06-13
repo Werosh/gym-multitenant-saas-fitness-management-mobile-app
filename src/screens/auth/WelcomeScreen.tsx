@@ -1,95 +1,161 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View,
+  ImageBackground,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  useWindowDimensions,
+  Platform,
+  StatusBar,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
-import { AuthLayout } from '../../components/ui/AuthLayout';
-import { AppText } from '../../components/ui/AppText';
-import { Button } from '../../components/ui/Button';
-import { SectionLabel } from '../../components/ui/SectionLabel';
-import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
+import { useResponsive } from '../../hooks/useResponsive';
 import { AuthStackParamList } from '../../navigation/types';
-import { spacing } from '../../config/theme';
+import { brand, spacing, borderRadius } from '../../config/theme';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Welcome'>;
 
-const DEMO_ACCOUNTS = [
-  { userId: 'user-owner-1', label: 'Owner', desc: 'Manage gym & members' },
-  { userId: 'user-trainer-1', label: 'Trainer', desc: 'Build workout plans' },
-  { userId: 'user-member-1', label: 'Member', desc: 'Track workouts & attendance' },
-];
+const HERO = require('../../../assets/welcome-hero.png');
 
 export function WelcomeScreen() {
   const navigation = useNavigation<Nav>();
-  const demoLogin = useAuthStore((s) => s.demoLogin);
   const colors = useThemeStore((s) => s.colors);
+  const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const { horizontalPadding, isSmallPhone } = useResponsive();
+
+  const footerPadBottom = Math.max(insets.bottom, spacing.md);
+  const footerPadHorizontal = Math.max(horizontalPadding, spacing.md);
 
   return (
-    <AuthLayout
-      headline="Run your gym. One platform."
-      subline="Memberships, trainers, workouts, and attendance — built for gym operators."
-    >
-      <View style={styles.main}>
-        <Button title="Create account" onPress={() => navigation.navigate('Register')} />
-        <Button title="Sign in" variant="outline" onPress={() => navigation.navigate('Login')} style={styles.gap} />
+    <View style={styles.root}>
+      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
 
-        <SectionLabel title="Quick access" style={styles.section} />
-        <View style={[styles.demoPanel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          {DEMO_ACCOUNTS.map((account, index) => (
+      <ImageBackground
+        source={HERO}
+        style={[styles.background, { width, height }]}
+        imageStyle={styles.backgroundImage}
+        resizeMode="cover"
+        accessibilityRole="image"
+        accessibilityLabel="MyGymHere welcome"
+      >
+        <View style={styles.overlay}>
+          <View
+            style={[
+              styles.footer,
+              {
+                paddingBottom: footerPadBottom,
+                paddingHorizontal: footerPadHorizontal,
+                paddingTop: isSmallPhone ? spacing.lg : spacing.xl,
+              },
+            ]}
+          >
             <TouchableOpacity
-              key={account.userId}
-              style={[
-                styles.demoRow,
-                index < DEMO_ACCOUNTS.length - 1 && {
-                  borderBottomColor: colors.borderSubtle,
-                  borderBottomWidth: StyleSheet.hairlineWidth,
-                },
-              ]}
-              onPress={() => demoLogin(account.userId)}
-              activeOpacity={0.7}
+              style={styles.cta}
+              onPress={() => navigation.navigate('Register')}
+              activeOpacity={0.85}
             >
-              <View style={styles.demoText}>
-                <AppText variant="h3" style={styles.demoLabel} numberOfLines={1}>
-                  {account.label}
-                </AppText>
-                <AppText variant="caption" secondary numberOfLines={2}>
-                  {account.desc}
-                </AppText>
-              </View>
-              <AppText style={{ color: colors.primary, fontWeight: '600', fontSize: 13, flexShrink: 0 }}>
-                Open
-              </AppText>
+              <Text style={styles.ctaText}>Get Started</Text>
             </TouchableOpacity>
-          ))}
+
+            <View style={styles.authRow}>
+              <TouchableOpacity
+                style={styles.authBtn}
+                onPress={() => navigation.navigate('Register')}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.authBtnText, { color: colors.text }]}>Sign up</Text>
+              </TouchableOpacity>
+
+              <View style={styles.divider} />
+
+              <TouchableOpacity
+                style={styles.authBtn}
+                onPress={() => navigation.navigate('Login')}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.authBtnText, { color: brand.green }]}>Log in</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-      </View>
-    </AuthLayout>
+      </ImageBackground>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  main: {
-    flexGrow: 1,
+  root: {
+    flex: 1,
+    backgroundColor: brand.black,
+  },
+  background: {
+    flex: 1,
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
     justifyContent: 'flex-end',
-    paddingBottom: spacing.md,
-    width: '100%',
   },
-  gap: { marginTop: spacing.sm },
-  section: { marginTop: spacing.xl, marginBottom: spacing.sm },
-  demoPanel: {
-    borderRadius: 6,
-    borderWidth: StyleSheet.hairlineWidth,
-    overflow: 'hidden',
+  footer: {
     width: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(162, 255, 0, 0.2)',
   },
-  demoRow: {
+  cta: {
+    minHeight: 52,
+    borderRadius: borderRadius.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    backgroundColor: brand.green,
+    ...Platform.select({
+      ios: {
+        shadowColor: brand.green,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.35,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  ctaText: {
+    color: brand.black,
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: 0.4,
+  },
+  authRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: 14,
-    gap: spacing.sm,
+    justifyContent: 'center',
+    marginTop: spacing.lg,
+    flexWrap: 'wrap',
+    gap: spacing.md,
   },
-  demoText: { flex: 1, minWidth: 0 },
-  demoLabel: { fontSize: 15, marginBottom: 2 },
+  authBtn: {
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  authBtnText: {
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  divider: {
+    width: 1,
+    height: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+  },
 });

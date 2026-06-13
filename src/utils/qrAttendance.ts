@@ -1,6 +1,6 @@
 /**
  * QR Attendance logic placeholder.
- * Expected QR payload format: gymhub://checkin?gymId=xxx&memberId=yyy
+ * Expected QR payload format: mygymhere://checkin?gymId=xxx&memberId=yyy
  */
 
 export interface QRAttendancePayload {
@@ -10,8 +10,8 @@ export interface QRAttendancePayload {
 
 export function parseQRAttendanceData(data: string): QRAttendancePayload | null {
   try {
-    if (data.startsWith('gymhub://checkin')) {
-      const url = new URL(data.replace('gymhub://', 'https://'));
+    if (data.startsWith('mygymhere://checkin')) {
+      const url = new URL(data.replace('mygymhere://', 'https://'));
       const gymId = url.searchParams.get('gymId');
       const memberId = url.searchParams.get('memberId');
       if (gymId && memberId) {
@@ -30,7 +30,7 @@ export function parseQRAttendanceData(data: string): QRAttendancePayload | null 
 }
 
 export function generateQRAttendancePayload(gymId: string, memberId: string): string {
-  return `gymhub://checkin?gymId=${encodeURIComponent(gymId)}&memberId=${encodeURIComponent(memberId)}`;
+  return `mygymhere://checkin?gymId=${encodeURIComponent(gymId)}&memberId=${encodeURIComponent(memberId)}`;
 }
 
 export function validateQRCheckIn(

@@ -12,7 +12,7 @@ interface ThemeState {
   hydrate: () => Promise<void>;
 }
 
-const STORAGE_KEY = '@gymhub_theme';
+const STORAGE_KEY = '@mygymhere_theme';
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
   mode: 'dark',

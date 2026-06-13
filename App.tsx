@@ -22,7 +22,7 @@ export default function App() {
     <SafeAreaProvider>
       <NavigationContainer theme={navTheme}>
         <RootNavigator />
-        <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+        <StatusBar style="light" />
       </NavigationContainer>
     </SafeAreaProvider>
   );

@@ -18,7 +18,7 @@ export function RootNavigator() {
   const needsGymSetup = useNeedsGymSetup();
 
   if (!isInitialized) {
-    return <LoadingScreen message="Initializing GymHub..." />;
+    return <LoadingScreen message="Initializing MyGymHere..." />;
   }
 
   if (!profile) {

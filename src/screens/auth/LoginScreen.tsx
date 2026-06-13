@@ -40,7 +40,7 @@ export function LoginScreen() {
   return (
     <AuthLayout
       headline="Sign in"
-      subline="Use your GymHub account credentials."
+      subline="Use your MyGymHere account credentials."
       footer={
         <TouchableOpacity onPress={() => navigation.navigate('Register')} style={styles.footerLink}>
           <AppText secondary>
@@ -72,7 +72,7 @@ export function LoginScreen() {
 
       <Button title="Sign in" onPress={handleLogin} loading={isLoading} />
       <AppText variant="small" muted style={styles.hint}>
-        Demo: owner@gymhub.com · password123
+        Demo: owner@mygymhere.com · password123
       </AppText>
     </AuthLayout>
   );

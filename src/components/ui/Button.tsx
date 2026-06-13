@@ -7,7 +7,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useThemeStore } from '../../stores/themeStore';
-import { borderRadius, spacing } from '../../config/theme';
+import { borderRadius, spacing, brand } from '../../config/theme';
 
 interface ButtonProps {
   title: string;
@@ -33,7 +33,7 @@ export function Button({
   const variants = {
     primary: {
       bg: colors.primary,
-      text: '#FFFFFF',
+      text: colors.onPrimary ?? brand.black,
       border: colors.primary,
     },
     secondary: {

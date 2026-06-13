@@ -36,7 +36,7 @@ export const mockUsers: UserProfile[] = [
     userId: 'user-admin-1',
     gymId: null,
     name: 'Super Admin',
-    email: 'admin@gymhub.com',
+    email: 'admin@mygymhere.com',
     role: 'super_admin',
     createdAt: now,
     updatedAt: now,
@@ -45,7 +45,7 @@ export const mockUsers: UserProfile[] = [
     userId: 'user-owner-1',
     gymId: 'gym-1',
     name: 'Alex Owner',
-    email: 'owner@gymhub.com',
+    email: 'owner@mygymhere.com',
     role: 'owner',
     createdAt: now,
     updatedAt: now,
@@ -54,7 +54,7 @@ export const mockUsers: UserProfile[] = [
     userId: 'user-trainer-1',
     gymId: 'gym-1',
     name: 'Sam Trainer',
-    email: 'trainer@gymhub.com',
+    email: 'trainer@mygymhere.com',
     role: 'trainer',
     createdAt: now,
     updatedAt: now,
@@ -63,7 +63,7 @@ export const mockUsers: UserProfile[] = [
     userId: 'user-member-1',
     gymId: 'gym-1',
     name: 'Jordan Member',
-    email: 'member@gymhub.com',
+    email: 'member@mygymhere.com',
     role: 'member',
     age: 28,
     weight: 75,
@@ -79,7 +79,7 @@ export const mockUsers: UserProfile[] = [
     userId: 'user-member-2',
     gymId: 'gym-1',
     name: 'Taylor Reed',
-    email: 'taylor@gymhub.com',
+    email: 'taylor@mygymhere.com',
     role: 'member',
     age: 32,
     weight: 68,
@@ -152,11 +152,11 @@ export const mockMemberships: Membership[] = [
 
 /** In-memory credentials map (email -> password) */
 export const mockCredentials: Record<string, string> = {
-  'admin@gymhub.com': MOCK_PASSWORD,
-  'owner@gymhub.com': MOCK_PASSWORD,
-  'trainer@gymhub.com': MOCK_PASSWORD,
-  'member@gymhub.com': MOCK_PASSWORD,
-  'taylor@gymhub.com': MOCK_PASSWORD,
+  'admin@mygymhere.com': MOCK_PASSWORD,
+  'owner@mygymhere.com': MOCK_PASSWORD,
+  'trainer@mygymhere.com': MOCK_PASSWORD,
+  'member@mygymhere.com': MOCK_PASSWORD,
+  'taylor@mygymhere.com': MOCK_PASSWORD,
 };
 
 let idCounter = 100;
