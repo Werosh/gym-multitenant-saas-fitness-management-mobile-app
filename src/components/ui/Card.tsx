@@ -6,13 +6,21 @@ import { borderRadius, spacing } from '../../config/theme';
 interface CardProps {
   children: React.ReactNode;
   style?: ViewStyle;
+  padded?: boolean;
 }
 
-export function Card({ children, style }: CardProps) {
+export function Card({ children, style, padded = true }: CardProps) {
   const colors = useThemeStore((s) => s.colors);
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }, style]}>
+    <View
+      style={[
+        styles.card,
+        padded && styles.padded,
+        { backgroundColor: colors.card, borderColor: colors.border },
+        style,
+      ]}
+    >
       {children}
     </View>
   );
@@ -20,9 +28,11 @@ export function Card({ children, style }: CardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: borderRadius.md,
-    padding: spacing.md,
-    borderWidth: 1,
+    borderRadius: borderRadius.sm,
+    borderWidth: StyleSheet.hairlineWidth,
     marginBottom: spacing.md,
+  },
+  padded: {
+    padding: spacing.md,
   },
 });

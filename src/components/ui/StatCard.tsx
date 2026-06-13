@@ -2,8 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useThemeStore } from '../../stores/themeStore';
 import { AppText } from './AppText';
-import { Card } from './Card';
-import { borderRadius, spacing } from '../../config/theme';
+import { spacing } from '../../config/theme';
 
 interface StatCardProps {
   label: string;
@@ -13,36 +12,43 @@ interface StatCardProps {
 
 export function StatCard({ label, value, accent }: StatCardProps) {
   const colors = useThemeStore((s) => s.colors);
+  const barColor = accent ?? colors.primary;
 
   return (
-    <Card style={styles.card}>
-      <View style={[styles.accent, { backgroundColor: accent ?? colors.primary }]} />
-      <AppText variant="caption" secondary>
+    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View style={[styles.accent, { backgroundColor: barColor }]} />
+      <AppText variant="label" secondary style={styles.label}>
         {label}
       </AppText>
-      <AppText variant="h2" style={styles.value}>
+      <AppText variant="stat" style={styles.value}>
         {value}
       </AppText>
-    </Card>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    minWidth: '45%',
+    minWidth: '46%',
+    padding: spacing.md,
+    paddingLeft: spacing.md + 4,
+    borderRadius: 6,
+    borderWidth: StyleSheet.hairlineWidth,
+    marginBottom: spacing.sm,
     overflow: 'hidden',
   },
   accent: {
     position: 'absolute',
-    top: 0,
     left: 0,
-    right: 0,
-    height: 3,
-    borderTopLeftRadius: borderRadius.md,
-    borderTopRightRadius: borderRadius.md,
+    top: 0,
+    bottom: 0,
+    width: 3,
+  },
+  label: {
+    marginBottom: spacing.xs,
   },
   value: {
-    marginTop: spacing.xs,
+    fontVariant: ['tabular-nums'],
   },
 });

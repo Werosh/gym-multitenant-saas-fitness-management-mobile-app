@@ -25,13 +25,13 @@ export function EmptyState({ title, description }: EmptyStateProps) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.xl,
+    paddingVertical: spacing.xxl,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'flex-start',
   },
   description: {
     marginTop: spacing.sm,
-    textAlign: 'center',
+    lineHeight: 20,
+    maxWidth: 280,
   },
 });

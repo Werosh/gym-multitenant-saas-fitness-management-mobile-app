@@ -14,7 +14,7 @@ export function Header({ title, subtitle, rightAction }: HeaderProps) {
   const colors = useThemeStore((s) => s.colors);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { borderBottomColor: colors.borderSubtle }]}>
       <View style={styles.left}>
         <AppText variant="h2">{title}</AppText>
         {subtitle && (
@@ -24,8 +24,8 @@ export function Header({ title, subtitle, rightAction }: HeaderProps) {
         )}
       </View>
       {rightAction && (
-        <TouchableOpacity onPress={rightAction.onPress}>
-          <AppText style={{ color: colors.primary, fontWeight: '600' }}>
+        <TouchableOpacity onPress={rightAction.onPress} hitSlop={8}>
+          <AppText variant="caption" style={{ color: colors.primary, fontWeight: '600' }}>
             {rightAction.label}
           </AppText>
         </TouchableOpacity>
@@ -38,13 +38,16 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'flex-end',
     marginBottom: spacing.lg,
+    paddingBottom: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   left: {
     flex: 1,
+    paddingRight: spacing.md,
   },
   subtitle: {
-    marginTop: spacing.xs,
+    marginTop: 4,
   },
 });

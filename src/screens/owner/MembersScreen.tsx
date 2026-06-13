@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Header } from '../../components/ui/Header';
 import { Card } from '../../components/ui/Card';
 import { AppText } from '../../components/ui/AppText';
-import { Button } from '../../components/ui/Button';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { RoleGuard } from '../../components/guards/RoleGuard';
 import { useAuthStore } from '../../stores/authStore';
@@ -37,7 +37,7 @@ export function MembersScreen() {
     trainers.find((t) => t.userId === trainerId)?.name ?? 'Unassigned';
 
   const handleDelete = (memberId: string, name: string) => {
-    Alert.alert('Remove Member', `Remove ${name}?`, [
+    Alert.alert('Remove member', `Remove ${name}?`, [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Remove',
@@ -56,47 +56,39 @@ export function MembersScreen() {
       <ScreenContainer>
         <Header
           title="Members"
-          subtitle={`${members.length} total`}
-          rightAction={{ label: '+ Add', onPress: () => navigation.navigate('MemberForm', {}) }}
+          subtitle={`${members.length} registered`}
+          rightAction={{ label: 'Add', onPress: () => navigation.navigate('MemberForm', {}) }}
         />
 
         {members.length === 0 ? (
-          <EmptyState title="No members yet" description="Add your first member to get started." />
+          <EmptyState title="No members" description="Add members to start tracking memberships and attendance." />
         ) : (
           members.map((member) => (
             <Card key={member.userId}>
-              <View style={styles.row}>
+              <View style={styles.top}>
                 <View style={styles.info}>
-                  <AppText variant="h3">{member.name}</AppText>
-                  <AppText secondary>{member.email}</AppText>
-                  <AppText variant="caption" secondary style={styles.meta}>
-                    Trainer: {getTrainerName(member.trainerId)}
-                  </AppText>
-                  {member.goal && (
-                    <AppText variant="caption" secondary>
-                      Goal: {member.goal}
-                    </AppText>
-                  )}
-                  <View style={[styles.badge, { backgroundColor: colors.primary + '20' }]}>
-                    <AppText variant="small" style={{ color: colors.primary }}>
-                      {member.membershipStatus ?? 'active'}
-                    </AppText>
-                  </View>
+                  <AppText variant="h3" style={styles.name}>{member.name}</AppText>
+                  <AppText variant="caption" secondary>{member.email}</AppText>
                 </View>
-                <View style={styles.actions}>
-                  <Button
-                    title="Edit"
-                    variant="outline"
-                    onPress={() => navigation.navigate('MemberForm', { member })}
-                    style={styles.actionBtn}
-                  />
-                  <Button
-                    title="Remove"
-                    variant="danger"
-                    onPress={() => handleDelete(member.userId, member.name)}
-                    style={styles.actionBtn}
-                  />
-                </View>
+                <StatusBadge
+                  label={member.membershipStatus ?? 'active'}
+                  tone={member.membershipStatus === 'expired' ? 'warning' : 'success'}
+                />
+              </View>
+
+              <AppText variant="small" muted style={styles.detail}>
+                Trainer · {getTrainerName(member.trainerId)}
+                {member.goal ? `  ·  ${member.goal}` : ''}
+              </AppText>
+
+              <View style={styles.actions}>
+                <TouchableOpacity onPress={() => navigation.navigate('MemberForm', { member })}>
+                  <AppText style={{ color: colors.primary, fontWeight: '600', fontSize: 13 }}>Edit</AppText>
+                </TouchableOpacity>
+                <View style={[styles.actionSep, { backgroundColor: colors.border }]} />
+                <TouchableOpacity onPress={() => handleDelete(member.userId, member.name)}>
+                  <AppText style={{ color: colors.error, fontWeight: '600', fontSize: 13 }}>Remove</AppText>
+                </TouchableOpacity>
               </View>
             </Card>
           ))
@@ -107,29 +99,25 @@ export function MembersScreen() {
 }
 
 const styles = StyleSheet.create({
-  row: {
+  top: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
-  info: {
-    flex: 1,
-  },
-  meta: {
-    marginTop: spacing.xs,
-  },
-  badge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: 8,
-    marginTop: spacing.sm,
-  },
+  info: { flex: 1, paddingRight: spacing.sm },
+  name: { fontSize: 16, marginBottom: 2 },
+  detail: { marginTop: spacing.sm },
   actions: {
-    gap: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.md,
+    paddingTop: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(128,128,128,0.2)',
+    gap: spacing.md,
   },
-  actionBtn: {
-    paddingVertical: spacing.sm,
-    minHeight: 36,
-    paddingHorizontal: spacing.md,
+  actionSep: {
+    width: 1,
+    height: 14,
   },
 });

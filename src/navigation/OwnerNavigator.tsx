@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { OwnerTabParamList, OwnerStackParamList } from './types';
+import { getTabBarOptions } from './tabBarOptions';
 import { useThemeStore } from '../stores/themeStore';
 import { OwnerDashboardScreen } from '../screens/owner/OwnerDashboardScreen';
 import { MembersScreen } from '../screens/owner/MembersScreen';
@@ -22,10 +23,7 @@ function OwnerTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.tabBarInactive,
-        tabBarStyle: { backgroundColor: colors.tabBar, borderTopColor: colors.border },
+        ...getTabBarOptions(colors),
         tabBarIcon: ({ color, size }) => {
           const icons: Record<string, keyof typeof Ionicons.glyphMap> = {
             Dashboard: 'grid-outline',

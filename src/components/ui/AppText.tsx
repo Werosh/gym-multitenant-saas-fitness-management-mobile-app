@@ -4,21 +4,22 @@ import { useThemeStore } from '../../stores/themeStore';
 import { typography } from '../../config/theme';
 
 interface AppTextProps extends TextProps {
-  variant?: 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'small';
+  variant?: 'h1' | 'h2' | 'h3' | 'body' | 'caption' | 'small' | 'label' | 'stat';
   secondary?: boolean;
+  muted?: boolean;
 }
 
-export function AppText({ variant = 'body', secondary, style, ...props }: AppTextProps) {
+export function AppText({
+  variant = 'body',
+  secondary,
+  muted,
+  style,
+  ...props
+}: AppTextProps) {
   const colors = useThemeStore((s) => s.colors);
+  const color = muted ? colors.textMuted : secondary ? colors.textSecondary : colors.text;
 
   return (
-    <RNText
-      style={[
-        typography[variant],
-        { color: secondary ? colors.textSecondary : colors.text },
-        style,
-      ]}
-      {...props}
-    />
+    <RNText style={[typography[variant], { color }, style]} {...props} />
   );
 }

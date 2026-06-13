@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { AdminTabParamList, AdminStackParamList } from './types';
+import { getTabBarOptions } from './tabBarOptions';
 import { useThemeStore } from '../stores/themeStore';
 import { AdminDashboardScreen } from '../screens/admin/AdminDashboardScreen';
 
@@ -15,10 +16,7 @@ function AdminTabs() {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.tabBarInactive,
-        tabBarStyle: { backgroundColor: colors.tabBar, borderTopColor: colors.border },
+        ...getTabBarOptions(colors),
         tabBarIcon: ({ color, size }) => (
           <Ionicons name="shield-outline" size={size} color={color} />
         ),

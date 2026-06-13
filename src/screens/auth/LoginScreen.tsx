@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
-import { ScreenContainer } from '../../components/ui/ScreenContainer';
+import { AuthLayout } from '../../components/ui/AuthLayout';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { AppText } from '../../components/ui/AppText';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
 import { AuthStackParamList } from '../../navigation/types';
-import { MOCK_PASSWORD } from '../../data/mockData';
 import { isValidEmail, isValidPassword } from '../../utils/validators';
 import { spacing } from '../../config/theme';
 
@@ -27,92 +26,65 @@ export function LoginScreen() {
     clearError();
     const errors: typeof fieldErrors = {};
     if (!isValidEmail(email)) errors.email = 'Enter a valid email';
-    if (!isValidPassword(password)) errors.password = 'Password must be at least 6 characters';
+    if (!isValidPassword(password)) errors.password = 'Minimum 6 characters';
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
     try {
       await login(email.trim(), password);
     } catch {
-      Alert.alert('Login Failed', error ?? 'Unable to sign in. Please try again.');
+      Alert.alert('Sign in failed', error ?? 'Check your credentials and try again.');
     }
   };
 
   return (
-    <ScreenContainer>
-      <View style={styles.header}>
-        <AppText variant="h1">GymHub</AppText>
-        <AppText secondary style={styles.subtitle}>
-          Multi-gym management platform
-        </AppText>
-      </View>
-
-      <View style={[styles.form, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <AppText variant="h3" style={styles.formTitle}>
-          Sign In
-        </AppText>
-
-        <Input
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoComplete="email"
-          error={fieldErrors.email}
-        />
-        <Input
-          label="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          error={fieldErrors.password}
-        />
-
-        {error && (
-          <AppText style={{ color: colors.error, marginBottom: spacing.sm }}>{error}</AppText>
-        )}
-
-        <Button title="Sign In" onPress={handleLogin} loading={isLoading} />
-
-        <AppText variant="caption" secondary style={styles.demoHint}>
-          Demo: owner@gymhub.com / {MOCK_PASSWORD}
-        </AppText>
-
-        <TouchableOpacity onPress={() => navigation.navigate('Register')} style={styles.link}>
+    <AuthLayout
+      headline="Sign in"
+      subline="Use your GymHub account credentials."
+      footer={
+        <TouchableOpacity onPress={() => navigation.navigate('Register')} style={styles.footerLink}>
           <AppText secondary>
-            Don't have an account?{' '}
-            <AppText style={{ color: colors.primary }}>Register</AppText>
+            No account? <AppText style={{ color: colors.primary, fontWeight: '600' }}>Register</AppText>
           </AppText>
         </TouchableOpacity>
-      </View>
-    </ScreenContainer>
+      }
+    >
+      <Input
+        label="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoComplete="email"
+        error={fieldErrors.email}
+      />
+      <Input
+        label="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        error={fieldErrors.password}
+      />
+
+      {error && (
+        <AppText style={{ color: colors.error, marginBottom: spacing.sm, fontSize: 13 }}>{error}</AppText>
+      )}
+
+      <Button title="Sign in" onPress={handleLogin} loading={isLoading} />
+      <AppText variant="small" muted style={styles.hint}>
+        Demo: owner@gymhub.com · password123
+      </AppText>
+    </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    marginTop: spacing.xl,
-    marginBottom: spacing.xl,
+  footerLink: {
     alignItems: 'center',
+    paddingVertical: spacing.sm,
   },
-  subtitle: {
-    marginTop: spacing.sm,
-  },
-  form: {
-    borderRadius: 16,
-    padding: spacing.lg,
-    borderWidth: 1,
-  },
-  formTitle: {
-    marginBottom: spacing.lg,
-  },
-  demoHint: {
+  hint: {
     marginTop: spacing.md,
     textAlign: 'center',
-  },
-  link: {
-    marginTop: spacing.lg,
-    alignItems: 'center',
   },
 });

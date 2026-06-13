@@ -1,16 +1,16 @@
 import React, { useCallback, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Header } from '../../components/ui/Header';
 import { StatCard } from '../../components/ui/StatCard';
+import { SectionLabel } from '../../components/ui/SectionLabel';
 import { Card } from '../../components/ui/Card';
 import { AppText } from '../../components/ui/AppText';
-import { Button } from '../../components/ui/Button';
 import { RoleGuard } from '../../components/guards/RoleGuard';
 import { useAuthStore } from '../../stores/authStore';
-import { useGymStore } from '../../stores/gymStore';
+import { useThemeStore } from '../../stores/themeStore';
 import { getMembersByTrainer } from '../../services/memberService';
 import { getWorkoutsByTrainer } from '../../services/workoutService';
 import { TrainerStackParamList } from '../../navigation/types';
@@ -22,6 +22,7 @@ export function TrainerDashboardScreen() {
   const navigation = useNavigation<Nav>();
   const profile = useAuthStore((s) => s.profile);
   const logout = useAuthStore((s) => s.logout);
+  const colors = useThemeStore((s) => s.colors);
   const [assignedCount, setAssignedCount] = useState(0);
   const [workoutCount, setWorkoutCount] = useState(0);
 
@@ -42,30 +43,26 @@ export function TrainerDashboardScreen() {
     <RoleGuard allowedRoles={['trainer']}>
       <ScreenContainer>
         <Header
-          title="Trainer Dashboard"
-          subtitle={`Welcome, ${profile?.name ?? 'Trainer'}`}
-          rightAction={{ label: 'Logout', onPress: logout }}
+          title="Dashboard"
+          subtitle={profile?.name ?? 'Trainer'}
+          rightAction={{ label: 'Sign out', onPress: logout }}
         />
 
+        <SectionLabel title="Overview" />
         <View style={styles.statsGrid}>
-          <StatCard label="Assigned Members" value={assignedCount} />
-          <StatCard label="Active Workouts" value={workoutCount} />
+          <StatCard label="Members" value={assignedCount} />
+          <StatCard label="Workout plans" value={workoutCount} />
         </View>
 
-        <Card>
-          <AppText variant="h3">Quick Actions</AppText>
-          <Button
-            title="View Assigned Members"
+        <SectionLabel title="Actions" />
+        <Card padded={false}>
+          <TouchableOpacity
+            style={styles.linkRow}
             onPress={() => navigation.navigate('TrainerTabs', { screen: 'Members' })}
-            style={styles.btn}
-          />
-        </Card>
-
-        <Card>
-          <AppText variant="h3">Progress Tracking</AppText>
-          <AppText secondary style={{ marginTop: spacing.sm }}>
-            Update member weight and workout progress from the member detail screen.
-          </AppText>
+          >
+            <AppText variant="h3" style={styles.linkTitle}>Assigned members</AppText>
+            <AppText style={{ color: colors.primary, fontSize: 13, fontWeight: '600' }}>View</AppText>
+          </TouchableOpacity>
         </Card>
       </ScreenContainer>
     </RoleGuard>
@@ -76,9 +73,13 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     gap: spacing.sm,
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
-  btn: {
-    marginTop: spacing.md,
+  linkRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: spacing.md,
   },
+  linkTitle: { fontSize: 15 },
 });

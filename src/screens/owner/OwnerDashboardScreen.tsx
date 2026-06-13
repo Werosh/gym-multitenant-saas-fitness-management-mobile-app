@@ -4,8 +4,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
 import { Header } from '../../components/ui/Header';
 import { StatCard } from '../../components/ui/StatCard';
+import { SectionLabel } from '../../components/ui/SectionLabel';
 import { AppText } from '../../components/ui/AppText';
-import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { RoleGuard } from '../../components/guards/RoleGuard';
 import { useAuthStore } from '../../stores/authStore';
@@ -24,15 +24,10 @@ export function OwnerDashboardScreen() {
 
   const loadStats = useCallback(async () => {
     if (!profile?.gymId) return;
-    const data = await getOwnerStats(profile.gymId);
-    setStats(data);
+    setStats(await getOwnerStats(profile.gymId));
   }, [profile?.gymId, getOwnerStats]);
 
-  useFocusEffect(
-    useCallback(() => {
-      loadStats();
-    }, [loadStats])
-  );
+  useFocusEffect(useCallback(() => { loadStats(); }, [loadStats]));
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -44,36 +39,37 @@ export function OwnerDashboardScreen() {
     <RoleGuard allowedRoles={['owner']}>
       <ScreenContainer onRefresh={onRefresh} refreshing={refreshing}>
         <Header
-          title="Owner Dashboard"
-          subtitle={`Welcome, ${profile?.name ?? 'Owner'}`}
-          rightAction={{ label: 'Logout', onPress: logout }}
+          title="Dashboard"
+          subtitle={profile?.name ?? 'Owner'}
+          rightAction={{ label: 'Sign out', onPress: logout }}
         />
 
+        <SectionLabel title="Overview" />
         <View style={styles.statsGrid}>
-          <StatCard label="Total Members" value={stats?.totalMembers ?? '—'} />
-          <StatCard label="Active Members" value={stats?.activeMembers ?? '—'} accent={colors.success} />
+          <StatCard label="Members" value={stats?.totalMembers ?? '—'} />
+          <StatCard label="Active" value={stats?.activeMembers ?? '—'} accent={colors.success} />
           <StatCard label="Expired" value={stats?.expiredMemberships ?? '—'} accent={colors.warning} />
-          <StatCard label="Today's Check-ins" value={stats?.todayAttendance ?? '—'} accent={colors.secondary} />
+          <StatCard label="Check-ins today" value={stats?.todayAttendance ?? '—'} />
         </View>
 
+        <SectionLabel title="Revenue" />
         <Card>
-          <AppText variant="h3">Revenue (Placeholder)</AppText>
-          <AppText variant="h1" style={{ color: colors.primary, marginTop: spacing.sm }}>
-            ${stats?.revenuePlaceholder?.toFixed(2) ?? '0.00'}
+          <AppText variant="caption" secondary>Estimated monthly</AppText>
+          <AppText variant="stat" style={{ marginTop: spacing.xs }}>
+            ${stats?.revenuePlaceholder?.toFixed(0) ?? '0'}
           </AppText>
-          <AppText secondary style={{ marginTop: spacing.xs }}>
-            Estimated monthly revenue based on active memberships
+          <AppText variant="small" muted style={{ marginTop: spacing.xs }}>
+            Based on active memberships
           </AppText>
         </Card>
 
+        <SectionLabel title="Attendance" />
         <Card>
-          <AppText variant="h3">Attendance Summary</AppText>
-          <AppText secondary style={{ marginTop: spacing.sm }}>
-            {stats?.todayAttendance ?? 0} members checked in today
+          <AppText variant="h3">{stats?.todayAttendance ?? 0} check-ins</AppText>
+          <AppText variant="caption" secondary style={{ marginTop: 4 }}>
+            Recorded today at your gym
           </AppText>
         </Card>
-
-        <Button title="Sign Out" variant="outline" onPress={logout} />
       </ScreenContainer>
     </RoleGuard>
   );
@@ -83,7 +79,7 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
+    justifyContent: 'space-between',
+    marginBottom: spacing.sm,
   },
 });

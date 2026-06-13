@@ -3,20 +3,25 @@ import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { ScreenContainer } from '../../components/ui/ScreenContainer';
+import { BrandMark } from '../../components/ui/AuthLayout';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { AppText } from '../../components/ui/AppText';
+import { SectionLabel } from '../../components/ui/SectionLabel';
 import { useAuthStore } from '../../stores/authStore';
 import { useThemeStore } from '../../stores/themeStore';
 import { AuthStackParamList } from '../../navigation/types';
 import { UserRole } from '../../types';
 import { isValidEmail, isValidPassword, isValidGymCode } from '../../utils/validators';
-import { getRoleLabel } from '../../utils/roleUtils';
-import { spacing } from '../../config/theme';
+import { spacing, borderRadius } from '../../config/theme';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
 
-const ROLES: UserRole[] = ['owner', 'trainer', 'member'];
+const ROLES: { key: UserRole; label: string }[] = [
+  { key: 'owner', label: 'Owner' },
+  { key: 'trainer', label: 'Trainer' },
+  { key: 'member', label: 'Member' },
+];
 
 export function RegisterScreen() {
   const navigation = useNavigation<Nav>();
@@ -32,21 +37,11 @@ export function RegisterScreen() {
 
   const handleRegister = async () => {
     clearError();
-
-    if (!name.trim()) {
-      Alert.alert('Validation', 'Name is required');
-      return;
-    }
-    if (!isValidEmail(email)) {
-      Alert.alert('Validation', 'Enter a valid email');
-      return;
-    }
-    if (!isValidPassword(password)) {
-      Alert.alert('Validation', 'Password must be at least 6 characters');
-      return;
-    }
+    if (!name.trim()) { Alert.alert('Required', 'Name is required'); return; }
+    if (!isValidEmail(email)) { Alert.alert('Required', 'Enter a valid email'); return; }
+    if (!isValidPassword(password)) { Alert.alert('Required', 'Password must be at least 6 characters'); return; }
     if (role !== 'owner' && !isValidGymCode(gymCode)) {
-      Alert.alert('Validation', 'Enter a valid 6-character gym code');
+      Alert.alert('Required', 'Enter a valid 6-character gym code');
       return;
     }
 
@@ -60,69 +55,61 @@ export function RegisterScreen() {
         goal: goal.trim() || undefined,
       });
     } catch (err) {
-      Alert.alert('Registration Failed', err instanceof Error ? err.message : 'Unable to register');
+      Alert.alert('Registration failed', err instanceof Error ? err.message : 'Unable to register');
     }
   };
 
   return (
     <ScreenContainer>
-      <AppText variant="h2" style={styles.title}>
-        Create Account
-      </AppText>
+      <BrandMark compact />
+      <AppText variant="h2" style={styles.title}>Create account</AppText>
+      <AppText secondary style={styles.sub}>Set up your profile to get started.</AppText>
 
-      <Input label="Full Name" value={name} onChangeText={setName} />
-      <Input
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+      <SectionLabel title="Account" />
+      <Input label="Full name" value={name} onChangeText={setName} />
+      <Input label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
       <Input label="Password" value={password} onChangeText={setPassword} secureTextEntry />
 
-      <AppText variant="caption" secondary style={styles.roleLabel}>
-        Select Role
-      </AppText>
-      <View style={styles.roleRow}>
+      <SectionLabel title="Role" />
+      <View style={[styles.roleBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         {ROLES.map((r) => (
           <TouchableOpacity
-            key={r}
+            key={r.key}
             style={[
-              styles.roleChip,
-              {
-                backgroundColor: role === r ? colors.primary : colors.surface,
-                borderColor: colors.border,
-              },
+              styles.roleOption,
+              role === r.key && { backgroundColor: colors.elevated, borderColor: colors.primary },
             ]}
-            onPress={() => setRole(r)}
+            onPress={() => setRole(r.key)}
           >
-            <AppText style={{ color: role === r ? '#FFF' : colors.text, fontSize: 13 }}>
-              {getRoleLabel(r)}
+            <AppText
+              style={{
+                fontSize: 13,
+                fontWeight: '600',
+                color: role === r.key ? colors.primary : colors.textSecondary,
+              }}
+            >
+              {r.label}
             </AppText>
           </TouchableOpacity>
         ))}
       </View>
 
       {role !== 'owner' && (
-        <Input
-          label="Gym Code"
-          value={gymCode}
-          onChangeText={setGymCode}
-          autoCapitalize="characters"
-          maxLength={6}
-          placeholder="ABC123"
-        />
+        <>
+          <SectionLabel title="Gym" />
+          <Input label="Gym code" value={gymCode} onChangeText={setGymCode} autoCapitalize="characters" maxLength={6} placeholder="IRON01" />
+        </>
       )}
 
       {role === 'member' && (
-        <Input label="Fitness Goal (optional)" value={goal} onChangeText={setGoal} />
+        <Input label="Fitness goal" value={goal} onChangeText={setGoal} placeholder="Optional" />
       )}
 
-      <Button title="Register" onPress={handleRegister} loading={isLoading} />
+      <Button title="Create account" onPress={handleRegister} loading={isLoading} style={styles.submit} />
 
       <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.link}>
         <AppText secondary>
-          Already have an account? <AppText style={{ color: colors.primary }}>Sign In</AppText>
+          Have an account? <AppText style={{ color: colors.primary, fontWeight: '600' }}>Sign in</AppText>
         </AppText>
       </TouchableOpacity>
     </ScreenContainer>
@@ -130,26 +117,24 @@ export function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    marginBottom: spacing.lg,
-  },
-  roleLabel: {
-    marginBottom: spacing.sm,
-  },
-  roleRow: {
+  title: { marginTop: spacing.md, marginBottom: spacing.xs },
+  sub: { marginBottom: spacing.lg },
+  roleBar: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  roleChip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: 20,
+    borderRadius: borderRadius.sm,
     borderWidth: 1,
+    padding: 3,
+    marginBottom: spacing.md,
+    gap: 4,
   },
-  link: {
-    marginTop: spacing.lg,
+  roleOption: {
+    flex: 1,
     alignItems: 'center',
+    paddingVertical: 10,
+    borderRadius: borderRadius.xs,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
+  submit: { marginTop: spacing.sm },
+  link: { marginTop: spacing.lg, alignItems: 'center', paddingBottom: spacing.lg },
 });

@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { MemberTabParamList, MemberStackParamList } from './types';
+import { getTabBarOptions } from './tabBarOptions';
 import { useThemeStore } from '../stores/themeStore';
 import { MemberDashboardScreen } from '../screens/member/MemberDashboardScreen';
 import { WorkoutsScreen } from '../screens/member/WorkoutsScreen';
@@ -18,10 +19,7 @@ function MemberTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.tabBarInactive,
-        tabBarStyle: { backgroundColor: colors.tabBar, borderTopColor: colors.border },
+        ...getTabBarOptions(colors),
         tabBarIcon: ({ color, size }) => {
           const icons: Record<string, keyof typeof Ionicons.glyphMap> = {
             Dashboard: 'grid-outline',

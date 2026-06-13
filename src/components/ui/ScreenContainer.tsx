@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ScrollView, StyleSheet, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useThemeStore } from '../../stores/themeStore';
-import { spacing } from '../../config/theme';
+import { layout, spacing } from '../../config/theme';
 
 interface ScreenContainerProps {
   children: React.ReactNode;
@@ -47,11 +47,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: spacing.md,
+    paddingHorizontal: layout.screenPadding,
+    paddingTop: spacing.md,
     paddingBottom: spacing.xl,
   },
   content: {
     flex: 1,
-    padding: spacing.md,
+    paddingHorizontal: layout.screenPadding,
+    paddingTop: spacing.md,
   },
 });

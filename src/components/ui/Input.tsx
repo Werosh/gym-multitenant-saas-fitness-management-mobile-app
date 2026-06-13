@@ -1,7 +1,7 @@
 import React from 'react';
 import { TextInput, View, Text, StyleSheet, TextInputProps } from 'react-native';
 import { useThemeStore } from '../../stores/themeStore';
-import { borderRadius, spacing } from '../../config/theme';
+import { borderRadius, spacing, typography } from '../../config/theme';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -13,7 +13,9 @@ export function Input({ label, error, style, ...props }: InputProps) {
 
   return (
     <View style={styles.container}>
-      {label && <Text style={[styles.label, { color: colors.textSecondary }]}>{label}</Text>}
+      {label && (
+        <Text style={[styles.label, { color: colors.textSecondary }]}>{label.toUpperCase()}</Text>
+      )}
       <TextInput
         style={[
           styles.input,
@@ -24,7 +26,7 @@ export function Input({ label, error, style, ...props }: InputProps) {
           },
           style,
         ]}
-        placeholderTextColor={colors.textSecondary}
+        placeholderTextColor={colors.textMuted}
         {...props}
       />
       {error && <Text style={[styles.error, { color: colors.error }]}>{error}</Text>}
@@ -37,16 +39,15 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   label: {
-    fontSize: 14,
-    marginBottom: spacing.xs,
-    fontWeight: '500',
+    ...typography.label,
+    marginBottom: spacing.sm,
   },
   input: {
     borderWidth: 1,
     borderRadius: borderRadius.sm,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 4,
-    fontSize: 16,
+    paddingVertical: 13,
+    fontSize: 15,
     minHeight: 48,
   },
   error: {
