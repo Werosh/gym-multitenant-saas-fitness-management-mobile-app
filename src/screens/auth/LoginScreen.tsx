@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { AuthLayout } from '../../components/ui/AuthLayout';
@@ -11,6 +11,7 @@ import { useThemeStore } from '../../stores/themeStore';
 import { AuthStackParamList } from '../../navigation/types';
 import { isValidEmail, isValidPassword } from '../../utils/validators';
 import { spacing } from '../../config/theme';
+import { DemoLoginFab } from '../../components/ui/DemoLoginFab';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
 
@@ -38,7 +39,8 @@ export function LoginScreen() {
   };
 
   return (
-    <AuthLayout
+    <View style={styles.screen}>
+      <AuthLayout
       headline="Sign in"
       subline="Use your MyGymHere account credentials."
       footer={
@@ -75,10 +77,13 @@ export function LoginScreen() {
         Demo: owner@mygymhere.com · password123
       </AppText>
     </AuthLayout>
+      <DemoLoginFab />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: { flex: 1 },
   footerLink: {
     alignItems: 'center',
     paddingVertical: spacing.sm,

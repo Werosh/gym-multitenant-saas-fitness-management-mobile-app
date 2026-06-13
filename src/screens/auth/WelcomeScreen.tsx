@@ -16,6 +16,7 @@ import { useThemeStore } from '../../stores/themeStore';
 import { useResponsive } from '../../hooks/useResponsive';
 import { AuthStackParamList } from '../../navigation/types';
 import { brand, spacing, borderRadius } from '../../config/theme';
+import { DemoLoginFab } from '../../components/ui/DemoLoginFab';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Welcome'>;
 
@@ -84,6 +85,8 @@ export function WelcomeScreen() {
           </View>
         </View>
       </ImageBackground>
+
+      <DemoLoginFab />
     </View>
   );
 }

@@ -14,6 +14,7 @@ import { AuthStackParamList } from '../../navigation/types';
 import { UserRole } from '../../types';
 import { isValidEmail, isValidPassword, isValidGymCode } from '../../utils/validators';
 import { spacing, borderRadius } from '../../config/theme';
+import { DemoLoginFab } from '../../components/ui/DemoLoginFab';
 
 type Nav = NativeStackNavigationProp<AuthStackParamList, 'Register'>;
 
@@ -60,7 +61,8 @@ export function RegisterScreen() {
   };
 
   return (
-    <ScreenContainer keyboardAvoid>
+    <View style={styles.screen}>
+      <ScreenContainer keyboardAvoid>
       <BrandMark compact />
       <AppText variant="h2" style={styles.title}>Create account</AppText>
       <AppText secondary style={styles.sub}>Set up your profile to get started.</AppText>
@@ -113,10 +115,13 @@ export function RegisterScreen() {
         </AppText>
       </TouchableOpacity>
     </ScreenContainer>
+      <DemoLoginFab />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: { flex: 1 },
   title: { marginTop: spacing.md, marginBottom: spacing.xs },
   sub: { marginBottom: spacing.lg },
   roleBar: {
