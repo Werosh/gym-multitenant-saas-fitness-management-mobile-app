@@ -1,0 +1,57 @@
+import React, { useState } from 'react';
+import { Alert } from 'react-native';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { ScreenContainer } from '../../components/ui/ScreenContainer';
+import { Input } from '../../components/ui/Input';
+import { Button } from '../../components/ui/Button';
+import { AppText } from '../../components/ui/AppText';
+import { Card } from '../../components/ui/Card';
+import { useAuthStore } from '../../stores/authStore';
+import { TrainerStackParamList } from '../../navigation/types';
+import { updateMember } from '../../services/memberService';
+import { spacing } from '../../config/theme';
+
+type Route = RouteProp<TrainerStackParamList, 'MemberProgress'>;
+
+export function MemberProgressScreen() {
+  const route = useRoute<Route>();
+  const { memberId, memberName } = route.params;
+  const profile = useAuthStore((s) => s.profile);
+  const [weight, setWeight] = useState('');
+  const [goal, setGoal] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleUpdate = async () => {
+    if (!profile?.gymId) return;
+    setLoading(true);
+    try {
+      await updateMember(profile.gymId, memberId, {
+        weight: weight ? parseFloat(weight) : undefined,
+        goal: goal.trim() || undefined,
+      });
+      Alert.alert('Success', 'Member progress updated');
+    } catch (err) {
+      Alert.alert('Error', err instanceof Error ? err.message : 'Update failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ScreenContainer>
+      <AppText variant="h3" style={{ marginBottom: spacing.md }}>
+        Progress: {memberName}
+      </AppText>
+
+      <Card>
+        <AppText secondary>
+          Update basic numeric progress for this member. Detailed analytics coming soon.
+        </AppText>
+      </Card>
+
+      <Input label="Current Weight (kg)" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" />
+      <Input label="Goal" value={goal} onChangeText={setGoal} />
+      <Button title="Save Progress" onPress={handleUpdate} loading={loading} />
+    </ScreenContainer>
+  );
+}
